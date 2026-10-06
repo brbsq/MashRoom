@@ -1,0 +1,609 @@
+@font-face {
+  font-family: "MashRoom Display";
+  src: url("/landing/google-sans-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MashRoom Display";
+  src: url("/landing/google-sans-black.ttf") format("truetype");
+  font-weight: 900;
+  font-display: swap;
+}
+
+.welcome {
+  --settle: cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100svh;
+  min-height: 540px;
+  overflow: hidden;
+  background: #e9c99e;
+  color: #13110f;
+  font-family:
+    ui-rounded,
+    "SF Pro Rounded",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+.roomFrame {
+  position: absolute;
+  inset: -1.0185% -1.09375% -1.0185% -1.1458%;
+  z-index: -2;
+  overflow: hidden;
+}
+.room {
+  position: absolute;
+  width: 98.24%;
+  max-width: none;
+  height: 175%;
+  left: 0.89%;
+  top: -37.5%;
+  filter: blur(8px);
+}
+.glass {
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-bottom-color: rgb(255 255 255 / 20%);
+  border-radius: 999px;
+  background: rgb(240 240 240 / 20%);
+  backdrop-filter: blur(14px) saturate(115%);
+  -webkit-backdrop-filter: blur(14px) saturate(115%);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 20%);
+  color: inherit;
+}
+.header {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.navGlass {
+  position: absolute;
+  left: 1.823%;
+  top: 3.241%;
+  width: 77.083%;
+  height: 9.907%;
+  display: flex;
+  align-items: center;
+  padding-left: 24.22%;
+  padding-right: 1.82%;
+  gap: 2.7vw;
+  background: rgb(232 232 232 / 29%);
+  pointer-events: auto;
+}
+.version {
+  font-size: clamp(12px, 1.5625vw, 30px);
+  font-weight: 300;
+  white-space: nowrap;
+}
+.navGlass nav {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  gap: 0.6vw;
+}
+.navLink {
+  height: auto;
+  padding: 0.5em 0.3em;
+  border-radius: 30px;
+  color: #14110d;
+  font-size: clamp(12px, 1.5625vw, 30px);
+  font-weight: 300;
+  background: transparent;
+}
+.login {
+  position: absolute;
+  left: 80.833%;
+  top: 3.241%;
+  width: 17.292%;
+  height: 9.907%;
+  padding: 0;
+  color: #555;
+  font-size: clamp(14px, 1.5625vw, 30px);
+  font-weight: 800;
+  background: rgb(232 232 232 / 29%);
+  pointer-events: auto;
+}
+.brand {
+  color: inherit;
+}
+.welcome[data-login-open="true"] > .header,
+.welcome[data-login-open="true"] > .brand,
+.welcome[data-login-open="true"] > .splash {
+  visibility: hidden;
+}
+.logo {
+  position: absolute;
+  width: 43.0208%;
+  height: auto;
+  left: 28.4896%;
+  top: 11.4815%;
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  transition:
+    left 1.35s var(--settle),
+    top 1.35s var(--settle),
+    width 1.35s var(--settle),
+    opacity 1s ease,
+    transform 1.35s var(--settle),
+    filter 0.4s ease;
+  z-index: 3;
+}
+.brandName {
+  position: absolute;
+  left: 50%;
+  top: 72.6389%;
+  transform: translate(-50%, -40%);
+  font-family: "MashRoom Display", sans-serif;
+  font-weight: 700;
+  font-size: 10.4167vw;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 50%);
+  -webkit-text-stroke: 1px rgb(255 255 255 / 55%);
+  opacity: 0;
+  transition:
+    left 1.35s var(--settle),
+    top 1.35s var(--settle),
+    font-size 1.35s var(--settle),
+    transform 1.35s var(--settle),
+    opacity 1s ease 0.15s,
+    color 1.1s ease,
+    filter 0.4s ease;
+  z-index: 3;
+}
+.brandName strong {
+  font-weight: 900;
+}
+.welcome[data-phase="intro"] .logo {
+  opacity: 0.8;
+  transform: none;
+}
+.welcome[data-phase="intro"] .brandName {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+.welcome:is([data-phase="entering"], [data-phase="ready"]) .logo {
+  left: 3.073%;
+  top: calc(8.05555% - 1.61458vw);
+  width: 4.84375%;
+  transform: none;
+  opacity: 0.8;
+}
+.welcome:is([data-phase="entering"], [data-phase="ready"]) .brandName {
+  left: 15.2344%;
+  top: 8.1944%;
+  font-size: 2.08333vw;
+  transform: translate(-50%, -50%);
+  opacity: 0.7;
+  color: #000;
+  -webkit-text-stroke: 0;
+}
+.welcome:is([data-phase="entering"], [data-phase="ready"]) .brandName strong {
+  font-weight: 700;
+}
+.splash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.greeting {
+  position: absolute;
+  left: 0;
+  top: 21.6667%;
+  width: 100%;
+  height: 30.9259%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1vw;
+  line-height: 1.2;
+  font-family: "MashRoom Display", sans-serif;
+}
+.word {
+  display: inline-block;
+  pointer-events: auto;
+  color: transparent;
+  background-image:
+    linear-gradient(
+      110deg,
+      transparent 22%,
+      #fff7 38%,
+      #ffffff 46%,
+      #fffce3 50%,
+      #ffffff 54%,
+      #fff7 62%,
+      transparent 78%
+    ),
+    linear-gradient(
+      115deg,
+      #ffffff45 10%,
+      #ffffff70 29%,
+      #ffffffe8 45%,
+      #ffeed799 51%,
+      #fff8 65%,
+      #fff9 90%
+    );
+  background-size:
+    70% 100%,
+    260% 100%;
+  background-repeat: no-repeat;
+  background-position:
+    -40% 0,
+    100% 50%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 65%);
+  filter: drop-shadow(0 0 8px #fff9) drop-shadow(0 0 22px #ffe8a877);
+  animation: starlight 3.6s ease-in-out infinite;
+  transition:
+    transform 0.7s var(--settle),
+    filter 0.85s ease;
+  transform-origin: center;
+  cursor: default;
+}
+.hello {
+  font-weight: 700;
+  font-style: italic;
+  font-size: 4.1667vw;
+  align-self: center;
+  margin-top: 2.15vw;
+}
+.roomie {
+  font-weight: 900;
+  font-size: 6.6667vw;
+  animation-delay: 0.55s;
+}
+.word:hover,
+.word:focus-visible {
+  transform: scale(1.085) translateY(-3px);
+  filter: drop-shadow(0 0 12px #fffe) drop-shadow(0 0 32px #ffe8a8cc);
+  transition-duration: 0.16s, 0.2s;
+  outline: none;
+}
+.tagline {
+  position: absolute;
+  top: 47.7315%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 2.08333vw;
+  line-height: 1.1;
+  font-weight: 600;
+}
+.roles {
+  position: absolute;
+  left: 26.4583%;
+  top: 62.037%;
+  width: 47.03125%;
+  height: 11.7593%;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: auto;
+}
+.role {
+  width: 39.092%;
+  height: 100%;
+  padding: 0;
+  color: #000;
+  font-weight: 600;
+  font-size: 2.08333vw;
+}
+.sound {
+  position: absolute;
+  right: 2%;
+  bottom: 3%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  pointer-events: auto;
+}
+.navGlass,
+.login,
+.greeting,
+.tagline,
+.roles,
+.sound {
+  opacity: 0;
+  translate: 0 16px;
+  filter: blur(5px);
+  transition:
+    opacity 0.95s ease,
+    translate 1.1s var(--settle),
+    filter 0.95s ease;
+}
+.welcome:is([data-phase="entering"], [data-phase="ready"])
+  :is(.navGlass, .login, .greeting, .tagline, .roles, .sound) {
+  opacity: 1;
+  translate: 0 0;
+  filter: blur(0);
+}
+.navGlass {
+  transition-delay: 0.25s;
+}
+.login {
+  transition-delay: 0.38s;
+}
+.greeting {
+  transition-delay: 0.35s;
+}
+.tagline {
+  transition-delay: 0.55s;
+}
+.roles {
+  transition-delay: 0.7s;
+}
+.sound {
+  transition-delay: 0.85s;
+}
+.navLink,
+.login,
+.role,
+.sound,
+.skip {
+  transition-property:
+    opacity, translate, filter, transform, box-shadow, background;
+  transition-duration: 0.6s;
+  transition-timing-function: var(--settle);
+}
+.navLink:hover,
+.login:hover,
+.role:hover,
+.sound:hover,
+.skip:hover {
+  transform: scale(1.065);
+  box-shadow:
+    0 0 26px rgb(255 249 209 / 50%),
+    inset 0 0 16px rgb(255 255 255 / 20%);
+  background-color: rgb(255 255 255 / 31%);
+  transition-duration: 0.16s;
+  transition-delay: 0s;
+}
+.brand:hover :is(.logo, .brandName) {
+  filter: drop-shadow(0 0 10px #fff8);
+}
+.welcome[data-phase="ready"] .brand:hover .logo {
+  transform: scale(1.09);
+  transition-duration: 0.18s;
+}
+.welcome[data-phase="ready"] .brand:hover .brandName {
+  transform: translate(-50%, -50%) scale(1.045);
+  transition-duration: 0.18s;
+}
+.welcome :is(a, button):focus-visible {
+  outline: 3px solid #fff4b9;
+  outline-offset: 6px;
+  box-shadow: 0 0 20px #fff9;
+}
+.welcome .brand:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.brand:focus-visible :is(.logo, .brandName) {
+  outline: 2px solid #fff4b9;
+  outline-offset: 5px;
+  border-radius: 8px;
+  filter: drop-shadow(0 0 10px #fff8);
+}
+.skip {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff3;
+  border: 1px solid #fff5;
+  color: #342d22;
+  border-radius: 30px;
+  z-index: 4;
+  font-size: 13px;
+}
+.skip:hover {
+  transform: translateX(-50%) scale(1.06);
+}
+.infoDialog {
+  background: rgb(255 251 240 / 94%);
+  backdrop-filter: blur(20px);
+  border-radius: 28px;
+  color: #302719;
+  border: 1px solid #fff9;
+}
+.infoDialog p {
+  font-size: 16px;
+  line-height: 1.65;
+  color: #574d3d;
+}
+.infoDialog button,
+.infoDialog a {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.infoDialog button:hover,
+.infoDialog a:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 18px #ffe6b8;
+}
+@keyframes starlight {
+  0%,
+  8% {
+    background-position:
+      -240% 0,
+      100% 50%;
+  }
+  86%,
+  100% {
+    background-position:
+      340% 0,
+      0% 50%;
+  }
+}
+
+@media (max-width: 900px) {
+  .navGlass {
+    padding-left: 25%;
+    gap: 1.2vw;
+  }
+  .version {
+    display: none;
+  }
+  .navLink {
+    font-size: 14px;
+  }
+  .welcome:is([data-phase="entering"], [data-phase="ready"]) .brandName {
+    font-size: 21px;
+  }
+}
+@media (max-width: 600px) {
+  .welcome {
+    min-height: 640px;
+  }
+  .room {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    object-fit: cover;
+    object-position: center;
+    filter: blur(6px);
+  }
+  .roomFrame {
+    inset: -8px;
+  }
+  .navGlass {
+    left: 4%;
+    top: 20px;
+    width: 92%;
+    height: 112px;
+    padding: 58px 16px 8px;
+    display: block;
+  }
+  .navGlass nav {
+    width: 100%;
+    gap: 0;
+  }
+  .navLink {
+    min-height: 40px;
+    font-size: 14px;
+    padding: 8px 7px;
+  }
+  .login {
+    left: auto;
+    right: 7%;
+    top: 32px;
+    width: 112px;
+    height: 40px;
+    font-size: 14px;
+    border: 0;
+    background: #fff3;
+  }
+  .logo {
+    left: 10%;
+    top: 24%;
+    width: 80%;
+  }
+  .brandName {
+    top: 61%;
+    font-size: 16vw;
+  }
+  .welcome:is([data-phase="entering"], [data-phase="ready"]) .logo {
+    width: 52px;
+    top: 34px;
+    left: 7%;
+  }
+  .welcome:is([data-phase="entering"], [data-phase="ready"]) .brandName {
+    left: calc(7% + 56px);
+    top: 52px;
+    transform: translateY(-50%);
+    font-size: 19px;
+  }
+  .welcome[data-phase="ready"] .brand:hover .brandName {
+    transform: translateY(-50%) scale(1.045);
+  }
+  .greeting {
+    top: 26%;
+    height: 23%;
+    flex-direction: column;
+    gap: 0;
+  }
+  .hello {
+    font-size: 42px;
+    margin: 0 100px 0 0;
+  }
+  .roomie {
+    font-size: clamp(60px, 16vw, 88px);
+  }
+  .tagline {
+    top: 51%;
+    font-size: 21px;
+  }
+  .roles {
+    left: 8%;
+    top: 63%;
+    width: 84%;
+    height: 66px;
+    gap: 20px;
+  }
+  .role {
+    width: calc((100% - 20px) / 2);
+    font-size: 20px;
+  }
+  .sound {
+    right: 6%;
+    bottom: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome *,
+  .infoDialog * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .welcome .logo {
+    left: 3.073%;
+    top: calc(8.05555% - 1.61458vw);
+    width: 4.84375%;
+    transform: none;
+    opacity: 0.8;
+  }
+  .welcome .brandName {
+    left: 15.2344%;
+    top: 8.1944%;
+    font-size: 2.08333vw;
+    transform: translate(-50%, -50%);
+    opacity: 0.7;
+    color: #000;
+    -webkit-text-stroke: 0;
+  }
+  .welcome :is(.navGlass, .login, .greeting, .tagline, .roles, .sound) {
+    opacity: 1;
+    translate: none;
+    filter: none;
+  }
+  .word {
+    background-position:
+      40% 0,
+      50% 50%;
+  }
+  .word:hover,
+  .word:focus-visible {
+    transform: none;
+  }
+  .skip {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 600px) {
+  .welcome .logo {
+    width: 52px;
+    top: 34px;
+    left: 7%;
+  }
+  .welcome .brandName {
+    left: calc(7% + 56px);
+    top: 52px;
+    transform: translateY(-50%);
+    font-size: 19px;
+  }
+}

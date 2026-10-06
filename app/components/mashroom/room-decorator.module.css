@@ -1,0 +1,193 @@
+.canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.canvas[data-editing="true"] {
+  pointer-events: auto;
+}
+.item {
+  position: absolute;
+  aspect-ratio: 1;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  border-radius: 20px;
+}
+.item svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 5px 6px #5a3d1e12);
+}
+.canvas[data-editing="true"] .item {
+  pointer-events: auto;
+  cursor: grab;
+}
+.canvas[data-editing="true"] .item:active {
+  cursor: grabbing;
+}
+.item[data-selected="true"],
+.item:focus-visible {
+  outline: 2px dashed #8368a0;
+  outline-offset: 3px;
+  background: #fff1;
+}
+.editor {
+  pointer-events: auto;
+  position: absolute;
+  z-index: 100;
+  right: 20px;
+  top: 16%;
+  bottom: 20px;
+  width: 310px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px;
+  border-radius: 26px;
+  border: 1px solid #fff9;
+  background: linear-gradient(140deg, #ffffffe0, #fff8, #fff9);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  box-shadow:
+    inset 0 1px 2px white,
+    0 10px 40px #44312420;
+  color: #2e2738;
+}
+.editor header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+.editor[data-collapsed="true"] {
+  top: auto;
+  bottom: 12px;
+  height: auto;
+}
+.editor header button {
+  font-size: 10px;
+  padding: 5px;
+  flex-shrink: 0;
+}
+.editor h2 {
+  font-weight: 650;
+  font-size: 19px;
+  margin: 0;
+}
+.editor p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.editor header span {
+  font-size: 12px;
+  color: #716575;
+}
+.hint {
+  margin: 8px 0;
+  color: #675970;
+}
+.catalog {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.catalog button {
+  display: flex;
+  flex-direction: column;
+  height: 85px;
+  padding: 5px;
+  gap: 0;
+  border: 1px solid #fff9;
+  background: #fff5;
+  border-radius: 15px;
+}
+.catalog svg {
+  width: 54px;
+  height: 54px;
+}
+.catalog span {
+  font-size: 10px;
+}
+.inspector {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #fff9;
+}
+.inspector strong {
+  font-size: 14px;
+}
+.inspector label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 8px;
+  gap: 5px;
+}
+.inspector input {
+  width: 100%;
+  accent-color: #826a9c;
+  min-height: 28px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.actions button {
+  font-size: 11px;
+  min-height: 36px;
+}
+.notice {
+  min-height: 18px;
+  margin: 10px 0 4px;
+}
+.editor footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  position: sticky;
+  bottom: -18px;
+  padding: 10px 0;
+  background: #f6eee7ed;
+  border-radius: 14px;
+}
+.editor footer button {
+  min-height: 44px;
+}
+@media (max-width: 600px) {
+  .editor {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: 8px;
+    width: auto;
+    max-height: 33svh;
+    padding: 12px;
+    border-radius: 22px;
+  }
+  .catalog {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
+  }
+  .catalog button {
+    height: 66px;
+    padding: 2px;
+    white-space: normal;
+  }
+  .catalog svg {
+    width: 38px;
+    height: 38px;
+  }
+  .catalog span {
+    font-size: 8px;
+    line-height: 1.1;
+  }
+  .editor footer {
+    bottom: -12px;
+  }
+}

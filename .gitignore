@@ -1,0 +1,11 @@
+/work/
+.DS_Store
+app/node_modules/
+app/dist/
+app/.next/
+app/.wrangler/
+app/.dev.vars*
+app/.env*
+!app/.env.example
+app/out/
+node_modules/
