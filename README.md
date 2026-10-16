@@ -12,6 +12,40 @@ To make the Pages build locally, run `npm ci` and `npm run build:pages` from `ap
 
 ## Start here
 
+### Map, Closet, Roomie Maker and Shop
+
+The Pages build includes `/map`, `/closet`, `/roomie-maker` and `/shop`, with matching static entry files. The earlier `/map-preview` comparison remains a separate design archive. All progress and demo purchases remain device-local. The shared character now blinks naturally while idle or walking, beneath its glasses; hidden pages and reduced-motion preferences pause blinking.
+
+1. Enter the demo with a new display name and class. Maker opens before the first room visit. Existing demo profiles keep their appearance.
+2. In Maker, edit the Roomie name and features. Try body presets, skin tones, colours, filtering and Undo/Redo. Save opens the LEAVE/STAY dialog. Leaving an unsaved draft asks for confirmation; only Save commits changes.
+3. Open the room phone. Page 1 has Map, Shop and Wardrobe (Closet); page 2 has Storeroom (demo inventory) and Maker. Shop has Closet-style previews, search, saved finds, a device-local demo-points wallet, confirmed purchases and Arcade Tokens. Purchased collectibles appear in Storeroom and unlock in the room decorator. Prices are provisional; no real money or earned classroom rewards are connected. Mirror has been removed. Both phone sizes share the same active app page. The phone closes before launching another screen; returning restores the room and skips its first-visit fade. See `outputs/SHOP-WALLET-TOKENS-TESTING.md` for current behavior and boundaries.
+4. In Closet, choose a category and item. Only Tops, Bottoms, Shoes and Accessories have favourite stars. Hair and Makeup can still be saved. The colour wheel supports pointer selection, a native colour picker, hex entry and custom swatches. Favourites and swatches commit with Save, not Cancel.
+5. Map fades from the supplied refracted background into Rooma Maps. Choose a sample destination and Info. Choose Metro station → GO, then a station → GO to change neighbourhood; BACK leaves it unchanged. Home, Plaza and School open existing pages; the boutique explains that shopping is not implemented.
+6. Open More options → Decorate room. Add the six starter items, drag or use arrow keys (Shift for a larger nudge), scale 25–250%, reset size, rotate, duplicate or remove. Prints stay on walls; other current items use floor-contact anchors. Large or rotated items shrink when necessary to fit bounds. The highlighted area shows the permitted surface. Choose Behind Character, Automatic or In Front, then use ordering buttons. Rugs always remain underneath the scene.
+7. Save and refresh to check persistence. Visit the plaza to see the same Roomie. Movement is 2D, with four-frame front/left/right walk cycles: arms swing, knees bend and feet lift. Downward movement (including Arrow Down/S) faces the viewer; horizontal movement uses the side cycles. The cycle loops every 640ms only while moving; idle keeps its breathing animation. Upward movement retains the previous direction until back-facing artwork is available. Stopping restores the original front pose with the equipped tee and eyewear. Reduced motion disables frame playback.
+
+Appearance, favourites, swatches and furniture are device-local, isolated by identity and class. The student’s full name, care meters, points and other progress are not replaced by Maker. Legacy furniture migrates its front/behind intent and transforms, then fits to the correct surface. Storage failures retain drafts and show a retry message. Ceiling surfaces and furniture interaction metadata/callbacks are extension ports only: no collision, sitting, object use or interaction-settings UI is implemented.
+
+The supplied front artwork remains the idle and appearance-editor base. Front walking reuses its exact head with new animated body frames; side movement uses matching profile artwork. The MashRoom logo tee and Original Roomie specs are real wearable layers in all three walking directions. Other catalogue selections remain saved preview data until matching parts are supplied. Map uses the supplied Figma placeholder background with sample location records; it does not invent venue gameplay. Refraction is an exported appearance with ordinary-browser fades, not an experimental live shader. OS Reduce Motion skips staged loading, marquee and walking animations.
+
+Local static preview:
+
+```sh
+cd app
+npm run build:pages
+npm exec vite -- preview --config vite.pages.config.ts --host 127.0.0.1 --port 4173
+```
+
+Open `http://127.0.0.1:4173/MashRoom/login/`. Checks: `npm run typecheck`, `npm test`, `npm run build:pages` and `npm run build`.
+
+### Map comparison preview
+
+Open `/map-preview` on the local app to compare **H: Town plan**, **I: Town overlay**, **J: Downtown**, and **K: City districts**. Every design supports full-screen and glass-overlay views. Choose a map pin or use the destination list, then visit Home, Student plaza, or School. Future places show “Coming soon.” This preview is accessible without signing in; travel uses the existing demo pages.
+
+Drag to pan; use the zoom buttons or pinch on a touch screen. Keyboard users can focus the map and use arrow keys, `+`/`−`, and `Home` to recenter. Escape closes the map; clicking outside closes the overlay. Reduced motion is supported. The phone Map shortcut now opens the separate Figma Rooma Maps screen.
+
+For the static preview, run `npm run build:pages` and `npm exec vite -- preview --config vite.pages.config.ts --host 127.0.0.1 --port 4173` inside `app/`, then open `http://127.0.0.1:4173/MashRoom/map-preview/`.
+
 The application lives in `app/`. Open a terminal in this folder and run:
 
 ```sh
@@ -55,11 +89,11 @@ Use Node.js 24 or newer for the included SQLite-backed tests. Node 22.13+ can ru
 
 The `/pet` screen now implements the main room, six need-ring components, room switcher, and phone from the nine supplied Figma nodes. The whole screen fades in after its artwork loads; room changes fade out and back in. Reduced-motion preferences disable these effects and the character animations. The welcome greeting has a brighter, faster 3.6-second light sweep. Your supplied `logo1.png` is now the site's PNG favicon, unchanged.
 
-- Hover, tap, or keyboard-activate a ring to see its name, percentage and status. The liquid-glass pop-ups are read-only; care actions remain in Activities. Rings use 10-unit strokes (half their original thickness) and glass highlights, without a filled or blurred disc behind them. The original icon masks threshold/invert the backdrop into black on light scenery and white on dark scenery in browsers supporting backdrop filters. Smiley = happiness, Zzz = sleep, apple = hunger satisfaction, shower = hygiene, toilet = bladder comfort, heart = health. Higher is better for all six.
+- Hover, tap, or keyboard-activate a ring to see only its name and percentage in a read-only frosted-glass pop-up. Descriptions and buttons are omitted; care actions remain in Activities. The pop-up uses 32px backdrop blur with Safari and standard browser declarations retained in the build. Rings use 10-unit strokes (half their original thickness) and glass highlights, without a filled or blurred disc behind them. The original icon masks threshold/invert the backdrop into black on light scenery and white on dark scenery in browsers supporting backdrop filters. Smiley = happiness, Zzz = sleep, apple = hunger satisfaction, shower = hygiene, toilet = bladder comfort, heart = health. Higher is better for all six.
 - Rings are green at 50–100%, yellow at 25–49%, and red with a faint glow at 0–24%. Care is saved with the pet. Older pets receive bladder and health defaults without losing progress.
 - The door button opens the room switcher over the needs section and blurs that section. Outside taps, Escape, and selecting a room close it. Living room, bedroom, kitchen, bathroom and outdoors are available. The indoor destinations intentionally reuse the supplied empty-room artwork with different lighting; outdoors reuses the existing park. Individual furnished interiors are not yet provided.
 - Click/tap the scene or focus the room and use arrows/WASD to move the character. Movement stays within floor bounds, with breathing/sway idle motion and a walking bounce. This is animation of the supplied 2D character, not a rigged 3D model.
-- The phone grows from its live bottom-right miniature into a right-aligned overlay and shrinks back on dismissal. Click outside, click its bezel, or press Escape to close; screen interactions keep it open. Both sizes share the same contents, clock, device frame and theme. Reduced-motion mode makes the transition near-instant. Study, Map, Classmates and Chat open existing pages. Food and Activities offer working care actions; Notes is a temporary scratchpad. Store, Wardrobe, History, Bank and Wallet explain their preview/sample state. No purchases, earned points or transaction history are fabricated.
+- The phone grows from its live bottom-right miniature into a right-aligned overlay and shrinks back on dismissal. Click outside, click its bezel, or press Escape to close; screen interactions keep it open. Both sizes share the same contents, clock, device frame and theme. Reduced-motion mode makes the transition near-instant. Study, Map, Wardrobe, Maker, Shop, Classmates and Chat open existing pages. Food and Activities offer working care actions; Notes is a temporary scratchpad. Shop supports browsing, try-ons, saved finds, confirmed demo-point purchases and receipts. Bank/Wallet display that same local points/token balance; History remains an earned-ledger placeholder. Storeroom shows starter furniture, purchased collectibles and the current saved outfit. No real money or earned classroom credit is fabricated.
 - **Phone → Settings** switches between iPhone 6s-inspired and iPhone 18 Pro-style concept frames, both without camera cutouts. Meadow, Lavender, Sunset and Midnight themes apply immediately to both phone sizes. Choices persist locally per profile/class; they do not sync to accounts or other devices. Account & class settings remains a separate link in the phone. Add future models/themes in `app/lib/phone.ts` and their skin tokens in `room-phone.module.css`; the shared screen contents do not need rebuilding.
 
 Open **three dots → Decorate room** for six free starter furniture/decorations. Drag with mouse or touch, or select an item and use arrow keys (Shift for larger steps). Adjust size/rotation, place behind/in front of the character, duplicate, or remove. Save room persists the arrangement; Cancel discards the current editing session. There is a 40-item limit per room. Layouts are device-local, isolated by profile, class and room, including for Google profiles; they do not sync to Google or other devices. Reset demo also clears that profile's decor. These items are original SVG illustrations, not purchases or uploads.
@@ -68,7 +102,7 @@ Future room interactions belong in `app/lib/pet-room.ts`: add objects to a room'
 
 Implementation: `app/components/mashroom/pet-room.tsx`, `need-ring.tsx`, `room-phone.tsx`, `pet-room.module.css`, and `app/lib/pet-room.ts`. The pet route uses this full-screen design; other app pages keep their existing sidebar layout.
 
-The demo is saved **only on the current device/browser**. Classmates are simulated, not other people. Points and badges are sample displays. Actual 3D, hatching, the full economy, and live cross-device multiplayer are later roadmap work.
+The demo is saved **only on the current device/browser**. Classmates are simulated, not other people. Points and badges are sample displays. The game is fully 2D. Hatching, the full economy, and live cross-device multiplayer are later roadmap work.
 
 ## Optional Google setup
 

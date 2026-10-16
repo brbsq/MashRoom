@@ -23,6 +23,11 @@ import {
   defaultPhone,
   readPhonePreferences,
   phoneStorageKey,
+  phoneAppPages,
+  formatPhoneClock,
+  emptyPhoneSwipe,
+  trackPhoneSwipe,
+  swipePage,
   type PhonePreferences,
 } from "@/lib/phone";
 import type { StudentProfile } from "@/lib/types";
@@ -56,17 +61,6 @@ export function RoomIcon({
     />
   );
 }
-const apps = [
-  { name: "Study", icon: "92859.svg", href: "/classroom" },
-  { name: "Notes", icon: "6fb50.svg" },
-  { name: "History", icon: "8027d.svg" },
-  { name: "Food", icon: "dccd9.svg" },
-  { name: "Map", icon: "c03f8.svg", href: "/plaza" },
-  { name: "Store", icon: "c7e81.svg" },
-  { name: "Bank", icon: "31c32.svg" },
-  { name: "Wallet", icon: "42289.svg" },
-  { name: "Wardrobe", icon: "54242.svg" },
-];
 const dock = [
   { name: "Classmates", icon: "e2657.svg", href: "/plaza" },
   { name: "Chat", icon: "263d1.svg", href: "/chat" },
@@ -75,22 +69,46 @@ const dock = [
 
 export function RoomPhone({
   onApp,
+  onNavigate,
   profile,
 }: {
   onApp: (name: string) => void;
+  onNavigate: (href: string) => void;
   profile: StudentProfile;
 }) {
   const [open, setOpen] = useState(false);
   const [present, setPresent] = useState(false);
   const [view, setView] = useState<"home" | "settings">("home");
+  const [appPage, setAppPage] = useState(0);
+  const handoffTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (handoffTimer.current) clearTimeout(handoffTimer.current); }, []);
   const [preferences, setPreferences] =
     useState<PhonePreferences>(defaultPhone);
   const [notice, setNotice] = useState("");
   const [clock, setClock] = useState({ time: "", date: "" });
   const trigger = useRef<HTMLButtonElement>(null);
   const content = useRef<HTMLDivElement | null>(null);
+  const [interactiveScreen,setInteractiveScreen]=useState<HTMLDivElement|null>(null);
+  const gesture=useRef(emptyPhoneSwipe());
+  const touchStart=useRef<{x:number;y:number}|null>(null);
+  const suppressClickUntil=useRef(0);
   const handingOff = useRef(false);
   const storageKey = phoneStorageKey(profile);
+  useEffect(()=>{
+    if(!open||view!=="home")return;
+    const screen=interactiveScreen;
+    if(!screen)return;
+    const swipe=(event:WheelEvent)=>{
+      if(event.ctrlKey||Math.max(Math.abs(event.deltaX),Math.abs(event.deltaY))<1)return;
+      const unit=event.deltaMode===1?16:event.deltaMode===2?screen.clientWidth:1;
+      const next=trackPhoneSwipe(gesture.current,event.deltaX*unit,event.deltaY*unit,performance.now());
+      gesture.current=next.state;
+      event.preventDefault();
+      if(next.direction)setAppPage(page=>swipePage(page,next.direction));
+    };
+    screen.addEventListener("wheel",swipe,{passive:false});
+    return()=>screen.removeEventListener("wheel",swipe);
+  },[open,view,interactiveScreen]);
   useEffect(() => {
     try {
       setPreferences(readPhonePreferences(localStorage.getItem(storageKey)));
@@ -101,13 +119,7 @@ export function RoomPhone({
   useEffect(() => {
     const tick = () => {
       const now = new Date();
-      setClock({
-        time: now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        date: now.toLocaleDateString([], { day: "numeric", month: "short" }),
-      });
+      setClock(formatPhoneClock(now));
     };
     tick();
     const timer = setInterval(tick, 60000);
@@ -135,7 +147,13 @@ export function RoomPhone({
     [measure],
   );
   const changeOpen = (next: boolean) => {
+    gesture.current=emptyPhoneSwipe();
+    touchStart.current=null;
     if (next) {
+      // Reopening cancels a still-pending close-to-app handoff.
+      if (handoffTimer.current) clearTimeout(handoffTimer.current);
+      handoffTimer.current = null;
+      suppressClickUntil.current = 0;
       handingOff.current = false;
       setPresent(true);
     } else if (content.current) measure(content.current);
@@ -151,6 +169,7 @@ export function RoomPhone({
     }
   };
   const launch = (name: string) => {
+    if (handingOff.current) return;
     if (name === "Settings") {
       setView("settings");
       return;
@@ -170,9 +189,19 @@ export function RoomPhone({
     if (preview) return <span className={className}>{children}</span>;
     if (href)
       return (
-        <Link className={className} aria-label={label} href={href}>
+        <button className={className} aria-label={label} onClick={() => {
+          // A fast second tap must not queue a different destination while closing.
+          if (handingOff.current) return;
+          handingOff.current = true;
+          try { sessionStorage.setItem("mashroom:return-room", "1"); } catch {}
+          changeOpen(false);
+          handoffTimer.current = setTimeout(() => {
+            handoffTimer.current = null;
+            onNavigate(href);
+          }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 360);
+        }}>
           {children}
-        </Link>
+        </button>
       );
     return (
       <button
@@ -186,7 +215,13 @@ export function RoomPhone({
     );
   }
   const screen = (preview: boolean) => (
-    <div className={styles.screen}>
+    <div ref={preview?undefined:setInteractiveScreen} className={styles.screen} data-phone-screen={preview?"preview":"interactive"} data-view={view}
+      onClickCapture={preview?undefined:event=>{if(performance.now()<suppressClickUntil.current){event.preventDefault();event.stopPropagation();}}}
+      onTouchStart={preview||view!=="home"?undefined:event=>{const touch=event.touches[0];touchStart.current=event.touches.length===1?{x:touch.clientX,y:touch.clientY}:null;}}
+      onTouchMove={preview||view!=="home"?undefined:event=>{const start=touchStart.current,touch=event.touches[0];if(start&&touch&&Math.hypot(start.x-touch.clientX,start.y-touch.clientY)>8)suppressClickUntil.current=performance.now()+450;}}
+      onTouchEnd={preview||view!=="home"?undefined:event=>{const start=touchStart.current,touch=event.changedTouches[0];touchStart.current=null;if(!start||!touch)return;const next=trackPhoneSwipe(emptyPhoneSwipe(),start.x-touch.clientX,start.y-touch.clientY,performance.now());if(next.direction){suppressClickUntil.current=performance.now()+450;setAppPage(page=>swipePage(page,next.direction));}}}
+      onTouchCancel={()=>{touchStart.current=null;}}
+    >
       <div className={styles.clock}>
         <span>{clock.time}</span>
         <span>{clock.date}</span>
@@ -194,7 +229,7 @@ export function RoomPhone({
       {view === "home" ? (
         <>
           <div className={styles.apps}>
-            {apps.map((app) => (
+            {phoneAppPages[appPage].map((app) => (
               <div key={app.name}>
                 {action(
                   preview,
@@ -210,8 +245,8 @@ export function RoomPhone({
               </div>
             ))}
           </div>
-          <div className={styles.dots} aria-hidden="true">
-            ● ○ ○
+          <div className={styles.dots} aria-label={preview ? undefined : "Phone app pages"}>
+            {phoneAppPages.map((_,page) => preview ? <span className={styles.pageDot} key={page} data-active={appPage===page}/> : <button key={page} aria-label={`Phone app page ${page+1}`} aria-pressed={appPage===page} onClick={()=>setAppPage(page)}><span className={styles.pageDot} data-active={appPage===page}/></button>)}
           </div>
           <div
             className={styles.dock}

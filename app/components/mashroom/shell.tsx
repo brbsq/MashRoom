@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useApp } from "./provider";
+import { useWallet } from "./use-wallet";
 import { classes } from "@/lib/demo";
 import { AgentTools } from "./agent-tools";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,7 @@ function Navigation() {
 }
 export function Shell({ children }: { children: React.ReactNode }) {
   const { state, ready, logout } = useApp();
+  const {wallet}=useWallet(state?.profile);
   const pathname = usePathname();
   if (!ready)
     return (
@@ -144,9 +146,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="header-points">
             <Coins size={17} />
-            {state.profile.mode === "demo" ? "250" : "0"}
+            {wallet?.points??"—"}
             <span>
-              points{state.profile.mode === "demo" ? " · sample" : ""}
+              demo points · device-local
             </span>
           </div>
         </header>

@@ -1,0 +1,21 @@
+{
+  "scope": "local production",
+  "checks": {
+    "typecheck": "passed",
+    "tests": "42 passed",
+    "frameworkBuild": "passed",
+    "pagesBuild": "passed",
+    "assetCopies": "matched"
+  },
+  "asset": {
+    "path": "rooms/roomie-walk-front.png",
+    "sha256": "6abf2df3d4b57f73e02d29d37ffd40a7243c231a703000e43e4b68b8a6510569",
+    "width": 912,
+    "height": 1500
+  },
+  "animation": {
+    "frames": 4,
+    "frameDurationMs": 160,
+    "loopDurationMs": 640
+  }
+}

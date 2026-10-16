@@ -8,7 +8,6 @@
 }
 .item {
   position: absolute;
-  aspect-ratio: 1;
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
@@ -22,6 +21,10 @@
   pointer-events: none;
   filter: drop-shadow(0 5px 6px #5a3d1e12);
 }
+.surfaceGuide { position: absolute; pointer-events: none; left: 0; right: 0; background: #b9e49722; border: 2px dashed #b7d39999; }
+.surfaceGuide[data-surface=floor] { top: 83%; bottom: 3%; }.surfaceGuide[data-surface=wall] { top: 15%; bottom: 23%; }.surfaceGuide[data-surface=ceiling] { top: 0; height: 15%; }
+.surfaceGuide span { position: absolute; left: 45%; top: 4px; background: #ffffffe0; color: #536643; border-radius: 12px; padding: 4px 10px; font-size: 11px; }
+.inspector select { width: 100%; padding: 7px; border-radius: 10px; border: 1px solid #fff; background: #fff9; }
 .canvas[data-editing="true"] .item {
   pointer-events: auto;
   cursor: grab;

@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
+.plaza-roomie { width: 100%; height: 90px; }
+.plaza-avatar:has(.plaza-roomie) { height: 105px; transform: translate(-50%,-85%); }
+.plaza-roomie img { width: 100%!important; height: 100%!important; }
+.friend-roomie { width: 28px; height: 36px; }
 :root {
   --background: #f6f9f7;
   --foreground: #173b32;

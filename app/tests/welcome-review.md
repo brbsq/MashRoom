@@ -1,5 +1,7 @@
 # Figma welcome screen review
 
+Update 2026-10-15: Skip intro has now been removed by request. The notes below describe the earlier 2026-10-05 review; current welcome/login evidence is in `../../outputs/WELCOME-LOGIN-REFINEMENTS-TESTING.md`.
+
 Reviewed locally on 2026-10-05. No live Google or student data was changed.
 
 ## Verified in the browser

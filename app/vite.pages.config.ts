@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
+import { publicBuildDefines } from "./build/app-version";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
 const path = (file: string) => fileURLToPath(new URL(file, import.meta.url));
@@ -18,6 +19,7 @@ export default defineConfig({
     ],
   },
   define: {
+    ...publicBuildDefines(),
     "process.env.NEXT_PUBLIC_MASHROOM_PAGES": JSON.stringify("1"),
   },
   plugins: [react()],

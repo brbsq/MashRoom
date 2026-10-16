@@ -1,0 +1,11 @@
+Use case: identity-preserve.
+Asset type: production four-frame FRONT-FACING walking sprite sheet for MashRoom.
+Reference image: original Roomie without glasses, exact character, clothing, proportions and painterly texture.
+Create one transparent 2-column by 2-row sheet, FOUR EQUAL portrait cells, overall 2:3 portrait canvas. Order: top-left, top-right, bottom-left, bottom-right.
+Every cell shows the SAME character looking straight at the viewer, actually walking toward the camera, not sideways. Keep the head, face, hair, shoulders, hips and body size registered to the same positions in all four cells. Head neutral friendly expression and both eyes face forward. Character is walking in place for game animation: do not get larger between frames.
+Frame 1 contact: character's right leg (viewer's left) steps toward viewer with a clear larger forward shoe, opposite leg behind with heel lifted; opposite arm swings forward.
+Frame 2 passing: weight on the forward supporting leg, other knee bends and foot lifts as it passes under the hips; hands pass beside body.
+Frame 3 opposite contact: character's LEFT leg (viewer's right) steps toward viewer with forward shoe, right leg behind heel lifted; arms swap their swing visibly versus frame 1.
+Frame 4 opposite passing: weight on opposite supporting leg, right knee bends and foot lifts and passes underneath. Loop naturally back to 1.
+Clear alternating feet and arm motion, modest knee bend, relaxed slow walk, not running, jumping or dancing. Body and full head, hands and both shoes wholly inside each cell with safe margins. Same head centre and lowest planted sole baseline every frame.
+Preserve enormous dark-brown wavy layered curls and swept top lock, both large warm brown eyes, dark brows, peach skin and cheek blush, tiny nose and gentle smile. Charcoal short-sleeve high-neck tee with little white collar emblem, loose light-gray pleated trousers and gray-white chunky trainers with black N details. Match the original hand-painted shading and texture exactly. No glasses or accessories: eyewear is a separate runtime layer. Genuinely transparent alpha background, no floor, vignette, shadows, gridlines, labels or text.

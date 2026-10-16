@@ -19,6 +19,7 @@ import {
   type LoginRole,
 } from "@/components/mashroom/login-overlay";
 import { chime } from "@/lib/sound";
+import { releaseLabel, buildDescription } from "@/lib/build-version";
 import styles from "./welcome.module.css";
 
 const panels = {
@@ -36,7 +37,7 @@ const panels = {
   },
   credits: {
     title: "Made for little moments of growth",
-    description: "MashRoom · alpha build 0.2",
+    description: `MashRoom · ${releaseLabel}`,
     body: "Home screen design, room illustration, and glossy MashRoom logo supplied through your MashRoom Figma file. Heading type: Google Sans Flex. Built with React and the app’s existing shared components.",
   },
   submissions: {
@@ -112,10 +113,6 @@ export default function Welcome() {
   }, []);
 
   const ready = phase === "ready";
-  const skip = () => {
-    skipped.current = true;
-    setPhase("ready");
-  };
   return (
     <main
       ref={root}
@@ -137,7 +134,7 @@ export default function Welcome() {
       </div>
       <header className={styles.header} inert={!ready}>
         <div className={`${styles.glass} ${styles.navGlass}`}>
-          <span className={styles.version}>version: alpha build 0.2</span>
+          <span className={styles.version} title={buildDescription}>version: {releaseLabel}</span>
           <nav aria-label="Welcome navigation">
             {(["features", "help", "credits", "submissions"] as Panel[]).map(
               (item) => (
@@ -161,7 +158,7 @@ export default function Welcome() {
             setLoginRole("student");
           }}
         >
-          Log in here
+          Sign up here
         </Button>
       </header>
 
@@ -173,7 +170,6 @@ export default function Welcome() {
         tabIndex={ready ? 0 : -1}
         onClick={(e) => {
           e.preventDefault();
-          if (!ready) skip();
         }}
       >
         <Image
@@ -246,11 +242,6 @@ export default function Welcome() {
         </Button>
       </section>
 
-      {!ready && (
-        <Button variant="ghost" className={styles.skip} onClick={skip}>
-          Skip intro
-        </Button>
-      )}
       <span className="sr-only" role="status">
         {ready
           ? "Welcome to MashRoom. Choose Teachers or Students to get started."

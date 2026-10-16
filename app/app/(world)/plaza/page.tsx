@@ -1,6 +1,10 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { useRoomie } from "@/components/mashroom/use-roomie";
+import { RoomieRenderer } from "@/components/mashroom/roomie-renderer";
+import { movementFacing, type RoomieFacing } from "@/lib/roomie-motion";
 import {
   ArrowDown,
   ArrowLeft,
@@ -16,8 +20,12 @@ import { ChatPanel } from "@/components/mashroom/chat-panel";
 import { Button } from "@/components/ui/button";
 export default function Plaza() {
   const { state, room, snapshot } = useApp();
-  if (!state) return null;
+  const { appearance } = useRoomie(state?.profile,state?.pet.name);
   const me = snapshot.participants.find((p) => !p.simulated);
+  const previous = useRef<{x:number;y:number}|null>(null);
+  const [facing,setFacing] = useState<RoomieFacing>("right"),[walking,setWalking]=useState(false);
+  useEffect(()=>{if(!me)return;const last=previous.current;previous.current={x:me.x,y:me.y};if(!last)return;if(last.x===me.x&&last.y===me.y)return;setFacing(previous=>movementFacing(last,me,previous));setWalking(true);const timer=setTimeout(()=>setWalking(false),650);return()=>clearTimeout(timer);},[me?.x,me?.y]);
+  if (!state) return null;
   const step = (x: number, y: number) => {
     if (me) room.move(me.x + x, me.y + y);
   };
@@ -113,14 +121,14 @@ export default function Plaza() {
                   {p.bubble && !state.muted.includes(p.id) && (
                     <div className="speech-bubble">{p.bubble}</div>
                   )}
-                  <Image
+                  {!p.simulated ? <div className="plaza-roomie"><RoomieRenderer appearance={appearance} facing={walking?facing:"front"} walking={walking} label={`${p.name}'s Roomie`}/></div> : <Image
                     unoptimized
                     width={1254}
                     height={1254}
                     src="/pet.png"
                     alt={`${p.name}'s pet`}
                     style={{ filter: `hue-rotate(${p.hue}deg)` }}
-                  />
+                  />}
                   <span>
                     {p.name}
                     {p.simulated ? "" : " · you"}
@@ -155,14 +163,14 @@ export default function Plaza() {
             <div className="plaza-friends">
               {snapshot.participants.map((p) => (
                 <span key={p.id}>
-                  <Image
+                  {!p.simulated ? <div className="friend-roomie"><RoomieRenderer appearance={appearance} label=""/></div> : <Image
                     unoptimized
                     width={1254}
                     height={1254}
                     src="/pet.png"
                     alt=""
                     style={{ filter: `hue-rotate(${p.hue}deg)` }}
-                  />
+                  />}
                   {p.name}
                   <small>{p.simulated ? "demo" : "you"}</small>
                 </span>

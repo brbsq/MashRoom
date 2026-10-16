@@ -1,36 +1,51 @@
 "use client";
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import {
   decorCatalog,
+  isStarterDecor,
   decorStorageKey,
   normalizeDecor,
   readLayouts,
+  boundDecor,
+  sceneLayers,
+  surfaceBounds,
+  orderDecor,
   type DecorItem,
   type DecorKind,
   type RoomLayouts,
+  type FurnitureInteraction,
 } from "@/lib/room-decor";
 import type { RoomId } from "@/lib/pet-room";
 import type { StudentProfile } from "@/lib/types";
 import { DecorArt } from "./decor-art";
 import styles from "./room-decorator.module.css";
+import { useWallet } from "./use-wallet";
 
 export function RoomDecorator({
   profile,
   roomId,
   editing,
   onFinish,
+  character,
+  characterY = 95,
+  onFurnitureInteraction,
 }: {
   profile: StudentProfile;
   roomId: RoomId;
   editing: boolean;
   onFinish: () => void;
+  character?: (layer: number) => ReactNode;
+  characterY?: number;
+  onFurnitureInteraction?: (event: FurnitureInteraction) => void;
 }) {
+  const {wallet}=useWallet(profile);
   const [layouts, setLayouts] = useState<RoomLayouts>({});
   const [draft, setDraft] = useState<DecorItem[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [collapsed, setCollapsed] = useState(false);
+  const [metrics, setMetrics] = useState({aspect:16/9,characterHeight:70.8333});
   const heading = useRef<HTMLHeadingElement>(null);
   const canvas = useRef<HTMLDivElement>(null);
   const drag = useRef<{
@@ -41,6 +56,8 @@ export function RoomDecorator({
     item: DecorItem;
   } | null>(null);
   const key = decorStorageKey(profile);
+  useEffect(()=>{const el=canvas.current;if(!el)return;const observer=new ResizeObserver(([entry])=>{const {width,height}=entry.contentRect,aspect=width/height;setMetrics({aspect,characterHeight:width<=600?Math.min(52,103*aspect):Math.min(70.8333,39.876*aspect)});});observer.observe(el);return()=>observer.disconnect();},[]);
+  const bound = (item: DecorItem) => boundDecor(item,roomId,metrics.aspect,metrics.characterHeight);
   useEffect(() => {
     try {
       setLayouts(readLayouts(localStorage.getItem(key)));
@@ -62,15 +79,17 @@ export function RoomDecorator({
       return () => cancelAnimationFrame(frame);
     }
   }, [editing, roomId, layouts]);
-  const items = editing ? draft : layouts[roomId] || [];
-  const current = draft.find((item) => item.id === selected);
+  const items = (editing ? draft : layouts[roomId] || []).map(bound);
+  const layers = sceneLayers(items, characterY);
+  const current = items.find((item) => item.id === selected);
   const patch = (id: string, change: Partial<DecorItem>) =>
     setDraft((old) =>
       normalizeDecor(
         old.map((item) => (item.id === id ? { ...item, ...change } : item)),
-      ),
+      ).map(bound),
     );
   const add = (kind: DecorKind) => {
+    if(!isStarterDecor(kind)&&!wallet?.owned.includes(kind)){setNotice("Find this collectible in the Shop first.");return;}
     if (draft.length >= 40) {
       setNotice("This room can hold up to 40 items. Remove one to make space.");
       return;
@@ -89,8 +108,10 @@ export function RoomDecorator({
       scale: 1,
       rotation: 0,
       foreground: false,
+      layer: "auto",
+      order: 0,
     };
-    setDraft((old) => [...old, item]);
+    setDraft((old) => [...old, bound(item)]);
     setSelected(item.id);
     setNotice(`${decorCatalog.find((c) => c.id === kind)!.name} added.`);
   };
@@ -119,7 +140,7 @@ export function RoomDecorator({
     });
   };
   const save = () => {
-    const next = { ...layouts, [roomId]: normalizeDecor(draft) };
+    const next = { ...layouts, [roomId]: normalizeDecor(draft).map(bound) };
     try {
       localStorage.setItem(key, JSON.stringify(next));
     } catch {
@@ -142,7 +163,9 @@ export function RoomDecorator({
           if (e.target === e.currentTarget) setSelected(null);
         }}
       >
-        {items.map((item, index) => (
+        {editing && current && <div className={styles.surfaceGuide} data-surface={decorCatalog.find(c => c.id === current.kind)!.surface} style={{top:`${surfaceBounds(decorCatalog.find(c=>c.id===current.kind)!.surface,roomId==="outdoors")[0]}%`,bottom:`${100-surfaceBounds(decorCatalog.find(c=>c.id===current.kind)!.surface,roomId==="outdoors")[1]}%`}}><span>{decorCatalog.find(c => c.id === current.kind)!.surface} placement</span></div>}
+        {character?.(layers.__character)}
+        {items.map((item) => (
           <div
             key={item.id}
             role={editing ? "button" : undefined}
@@ -154,10 +177,13 @@ export function RoomDecorator({
             style={{
               left: `${item.x}%`,
               top: `${item.y}%`,
-              width: `${22 * item.scale}%`,
-              transform: `translate(-50%, -50%) rotate(${item.rotation}deg)`,
-              zIndex: (item.foreground ? 60 : 2) + index,
+              height: `calc(var(--roomie-height) * ${decorCatalog.find(c => c.id === item.kind)!.heightRatio * item.scale})`,
+              width: `calc(var(--roomie-height) * ${decorCatalog.find(c => c.id === item.kind)!.heightRatio * decorCatalog.find(c => c.id === item.kind)!.aspect * item.scale})`,
+              transform: `translate(-50%, ${item.kind === "art" ? "-50%" : "-100%"}) rotate(${item.rotation}deg)`,
+              transformOrigin: item.kind === "art" ? "50% 50%" : "50% 100%",
+              zIndex: layers[item.id],
             }}
+            onClick={() => { if (!editing && item.interaction) onFurnitureInteraction?.({ roomId, item, actionId: item.interaction.actionId }); }}
             onPointerDown={(e) => startDrag(e, item)}
             onPointerMove={moveDrag}
             onPointerUp={() => {
@@ -192,7 +218,7 @@ export function RoomDecorator({
               }
             }}
           >
-            <DecorArt kind={item.kind} />
+            <DecorArt kind={item.kind} fitted />
           </div>
         ))}
       </div>
@@ -233,13 +259,14 @@ export function RoomDecorator({
               className={styles.catalog}
               aria-label="Furniture and decorations"
             >
-              {decorCatalog.map((entry) => (
+              {decorCatalog.filter(entry=>isStarterDecor(entry.id)||wallet?.owned.includes(entry.id)).map((entry) => (
                 <Button
                   key={entry.id}
                   variant="ghost"
                   onClick={() => add(entry.id)}
                   aria-label={`Add ${entry.name}`}
-                  disabled={draft.length >= 40}
+                  disabled={draft.length >= 40 || (roomId === "outdoors" && entry.surface === "wall")}
+                  data-surface={entry.surface}
                 >
                   <DecorArt kind={entry.id} />
                   <span>{entry.name}</span>
@@ -259,14 +286,16 @@ export function RoomDecorator({
                   <input
                     aria-label="Furniture size"
                     type="range"
-                    min="50"
-                    max="160"
+                    min="25"
+                    max="250"
                     value={current.scale * 100}
                     onChange={(e) =>
                       patch(current.id, { scale: Number(e.target.value) / 100 })
                     }
                   />
                 </label>
+                <Button variant="outline" size="sm" onClick={() => patch(current.id, { scale: 1 })}>Reset size</Button>
+                <label>Layer<select aria-label="Furniture layer" value={current.layer} onChange={e => patch(current.id, { layer: e.target.value as DecorItem["layer"], foreground: e.target.value === "front" })}><option value="behind">Behind character</option><option value="auto">Automatic depth</option><option value="front">In front of character</option></select></label>
                 <label>
                   Rotation <output>{current.rotation}°</output>
                   <input
@@ -286,13 +315,12 @@ export function RoomDecorator({
                     variant="outline"
                     size="sm"
                     onClick={() =>
-                      patch(current.id, { foreground: !current.foreground })
+                      setDraft(old=>orderDecor(old,current.id,-1))
                     }
                   >
-                    {current.foreground
-                      ? "Behind character"
-                      : "In front of character"}
+                    Send backward
                   </Button>
+                  <Button variant="outline" size="sm" onClick={() => setDraft(old=>orderDecor(old,current.id,1))}>Bring forward</Button>
                   <Button
                     variant="outline"
                     size="sm"

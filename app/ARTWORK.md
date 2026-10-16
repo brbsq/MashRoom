@@ -1,5 +1,15 @@
 # Original MashRoom artwork
 
+## Figma creation screens and original Roomie
+
+`public/creation/` contains unchanged assets downloaded from MashRoom Figma file `13X03GNMt4ukNUfYYNIm4C`: Maker main `75:214`, Closet main `15:986`, controls `75:167` and `75:263`, colour bars/dialogs `74:165`, `75:276`, `75:181`, `75:185`, `75:290`, `75:297`, Map main `33:86`, loading `15:714`, Info `33:29`, and Metro `46:3`. Filename identifiers retain the exported source identity. `map-refraction.png` is the background-only rendered shader layer `15:715`, used with the approved ordinary-browser fade fallback; it is not a UI screenshot used as an implementation.
+
+Creation backgrounds: Closet `233ad.png`, Maker `37094.png`, Map placeholder `b9961.png`. Logos: MashRoom `cbbb1.png`, Rooma `6f910.png`, sample business `aeb51.png`. Downloaded SVG source roots are unchanged. Non-square shoes/body icons and the Metro line preserve intrinsic proportions.
+
+`roomie-renderer.tsx` keeps the original `/rooms/cd2bd.png` unchanged for idle, Maker and Closet previews. The room and student's plaza avatar use matching generated profile poses while moving: `/rooms/roomie-left.png` and `/rooms/roomie-right.png`. These depict side-facing anatomy, glasses and clothing rather than flipping or distorting the front image. All three poses are preloaded; the room's image box accommodates the wider side canvases so pose changes preserve character height and the floor anchor. The MashRoom logo tee uses real composited garment layers; other appearance choices remain UI-test data until matching parts are supplied. Pose selection preserves saved selections. Existing furniture illustrations in `decor-art.tsx` are original code-native artwork with fitted bounds. Mirror/Maker phone icons are original SVGs in `/rooms/mirror.svg` and `maker.svg`.
+
+The supplied Metro heading uses the open-source Zen Dots font, served locally as `creation/zen-dots.ttf`, from Google Fonts (`fonts.gstatic.com/s/zendots/v14/XRXX3ICfm00IGoesQeaE.ttf`). Upstream source/license: Google Fonts `ofl/zendots`. SF Pro / SF Pro Rounded use the macOS system font stack with accessible fallbacks.
+
 ## Figma home screen (October 2026)
 
 The new home screen uses the exact supplied Figma assets, not generated replacements:
@@ -54,7 +64,63 @@ Figma returned no authored keyframes for the main room or phone. Fades and chara
 
 ## Generated demo assets
 
+### Body-fitted tops (16 October 2026)
+
+The detached tee rectangle is superseded at runtime by `fitted-top.tsx` and the pose registrations in `lib/garment-rig.ts`. The renderer uses the original body silhouette, sleeve folds and arm/hand occlusion. A clipped fabric-colour mask changes only the baked shirt; registered crew-neck geometry replaces its old high collar/mark. The supplied shirt's flat chest print is composited independently with its pale reference background removed in an SVG filter. Original PNG files remain unchanged. Other top choices use the same fitted fabric system and colours; pocket and stripe details are code-native. Hair, facial-feature and other sample styles still require their final artwork.
+
+Every front/left/right idle pose and all four cells in each walking cycle use the same outfit renderer, shared by Closet, Maker, room and plaza. `node scripts/review-garments.mjs` creates a temporary local-only `/MashRoom/qa-garments.html` fixture in the Pages build for visual checks without writing profile data. A normal Pages rebuild removes that fixture. Evidence: `../outputs/refinement-fitted-outfit-all-poses.png`.
+
+### Front-facing walk (15 October 2026)
+
+`public/rooms/roomie-walk-front.png` is a 912 × 1500 RGBA 2×2 sheet with four registered 456 × 750 body frames. Built-in image generation used the original glasses-free front reference to create alternating contact/passing poses, with a forward shoe, bent knee and opposing arm swing. Raw source and full prompt: `../output/roomie-poses/front-walk/`. `node scripts/pack-roomie-front-walk.mjs` registers cells and produces the atlas, GIF and frame-strip previews.
+
+At runtime the renderer clips away the generated head and draws the unchanged original front head above the moving body. Its existing `SpecsLayer` handles legacy, removable and recoloured glasses in every frame, so the original face and accessories stay consistent. Front-specific tee placements and seam underlays keep the equipped logo shirt registered with the new torso/arm poses. The generated atlas is a body-animation source rather than a replacement for the original idle character.
+
+`lib/roomie-motion.ts` shares direction selection between the room and plaza: downward-dominant travel selects front, horizontal travel selects a side, and upward-only travel retains the last direction. The front cycle uses the existing 160ms frame / 640ms loop timing and reduced-motion support. Idle and editor previews, saved appearance fields and existing side artwork are preserved. Work remains in the local program and production outputs.
+
+### Optional original Roomie specs (15 October 2026)
+
+`public/accessories/roomie-specs/front.svg`, `left.svg` and `right.svg` are standalone transparent vector accessory assets traced to the original silver-gray frame style. The Closet card shows only the specs; the same assets are registered to the shared character renderer, including the walk atlas. Fabric and eyewear have separate saved colour values.
+
+Built-in image generation removed the baked-in glasses in three non-destructive sibling references: `bare-front.png`, `bare-left.png`, `bare-right.png`. Only softly masked face regions from those references are composited at runtime; original hair silhouettes, body, clothes, hands and shoes remain from the existing sprites. The original source files are not overwritten. The asset paths and complete prompts are in `../output/accessories/roomie-specs/prompts.json`.
+
+Two additional glasses-free 2×2 walk references (`bare-walk-left.png`, `bare-walk-right.png`) provide frame-specific face windows. The renderer samples each corresponding cell rather than reusing the still-view face, keeps the original gait/body atlas underneath, and masks overlays to the original silhouette. The separated SVG frames use pose-specific eye registration. The two edit prompts are included in the same prompt file.
+
+`accessories:6` equips the separated pair; `accessories:2` removes eyewear. Earlier sample selection indices keep their previous look rather than being silently remapped. The new pair supports saved per-item colour, favourites, undo/redo and save/cancel. Temporary legacy preview items still do not become additional real wearable designs.
+
+### Wearable MashRoom logo tee (15 October 2026)
+
+`public/clothing/mashroom-tee/reference.png` is the unchanged user-supplied garment reference sheet. The Closet thumbnail displays its front panel through an SVG crop. `front.png`, `left.png` and `right.png` are transparent, shirt-only adaptations created with built-in image generation to fit the existing chibi Roomie. They do not replace the character artwork. The white cotton tee retains the small coloured left-chest logo; the opposite profile naturally hides it.
+
+The shared renderer composites the garment over the original front/profile sprites and every walking frame. Pose-specific native SVG seam underlays conceal the old baked-in collar and sleeves. `lib/wearables.ts` records native canvas dimensions and registered placements. Fabric colour is optional, with the colourful print protected by an SVG colour mask. Full generation prompts and saved asset paths are recorded in `../output/clothing/mashroom-tee/prompts.json`. Other catalogue choices remain UI previews until their own wearable parts are supplied.
+
+The tee is appended as `tops:6`, preserving all previous saved selection indices. Per-item colours migrate safely into the existing appearance record; its first equip is white and does not inherit another top's tint. Existing save/cancel, undo/redo, favourites and profile/class isolation apply unchanged.
+
+### Roomie walking cycles (14 October 2026)
+
+`public/rooms/roomie-walk-left.png` and `roomie-walk-right.png` are transparent 912 × 1500 sprite sheets, each with four 456 × 750 cells in a 2×2 grid. The built-in image-generation tool created contact, passing, opposite-contact and opposite-passing drawings from the original front and approved direction-specific profile references. The character's curls, glasses, complexion, charcoal shirt, gray trousers and trainers remain consistent with those references. Full prompts and raw 1024 × 1536 sheets are in `../output/roomie-poses/walk/`.
+
+The fourth left-facing cell was refined separately as `left-passing-v2.png` so the opposite shoe lifts forward. The first three source cells remain unchanged; the refinement prompt is included in the same prompt set. `scripts/pack-roomie-walk.mjs` crops the cells, registers their head centre and floor baseline without redrawing features, checks that no frame clips, and packages the runtime sheets. It also exports animated GIF previews in `../outputs/`. Run it from `app/` with `node scripts/pack-roomie-walk.mjs` to regenerate the packed assets.
+
+The shared renderer displays one cell at a time through a clipped SVG viewport. CSS advances frames every 160ms, looping after 640ms, only during left/right movement. Both cycles preload with the original poses. The room's old whole-body walking sway is disabled so the frame animation supplies the gait; idle breathing and care effects remain. Stopping restores the original front PNG. Reduced-motion preferences disable frame playback. Maker, Closet and saved appearance data are unchanged.
+
+### Roomie side poses (14 October 2026)
+
+`public/rooms/roomie-left.png` (977 × 1610) and `roomie-right.png` (977 × 1609) are RGBA sprites with genuine transparency. Generated separately with the built-in image-generation tool using the original front Roomie as the identity/style reference; the right pose also references the completed left pose. The original front sprite and creation assets are unchanged. Raw generation outputs remain in the Codex generated-images directory. Full prompts are recorded in `../output/roomie-poses/prompts.json`.
+
+Prompt intent for both poses: preserve the same voluminous dark-brown swept curls, chibi proportions, warm peach skin, gray glasses, brown eye, blush and smile, charcoal high-neck tee with collar emblem, loose gray trousers, chunky gray/white trainers and painterly texture; draw actual left/right side anatomy with one near eye and glasses lens, a modest walking stride, complete head/hands/shoes and transparent margins. No background, ground shadow, UI or labels. The opposite profile retains readable shoe details.
+
+### Map comparison artwork (October 2026)
+
+`public/maps/town.png` and `public/maps/city.png` are continuous map backgrounds generated with the built-in image tool from the H town and J city concept previews. The concepts used the existing landing room and character as style references. All visible map pins, labels, controls and destination cards are rendered in React; no UI text is baked into these backgrounds. Both full-screen/overlay variants share their town or city artwork; the district preview adds native overlays to the city map.
+
+Edit prompt for each source concept: “Edit this MashRoom map screenshot into a CLEAN MAP BACKGROUND ASSET. Remove absolutely ALL UI: header bars, brand/logo, letters, text, labels, pins, markers, icons, circular buttons, glass panels, side cards, avatar, footer. Reconstruct the streets and buildings underneath every removed interface area. Keep the illustrated world and composition: home northwest, fountain plaza near centre, school in the original location, parks, roads, shops. Preserve the warm cream terracotta sage painterly illustration and perspective. Entire image must be a continuous urban map landscape edge to edge, no interface, no text, no labels, no logo. Preserve 16:9 landscape composition.”
+
 Generated with the built-in image-generation tool, exactly one generation per asset, with no third-party character references. Original files are retained in `../work/art/`.
+
+### Roomie eyelids (16 October 2026)
+
+Natural blinking is a code-native SVG overlay (`blink-layer.tsx`), not replacement raster artwork. Soft skin-gradient patches and curved closed eyelids are registered separately for front/side idle poses and every side-walk atlas cell. The front walk shares its existing registered idle head. The existing bare-face artwork is composed beneath original-colour or equipped SVG spectacles, so eyelids do not distort the frames. Original PNG assets remain unchanged.
 
 ## Pet
 

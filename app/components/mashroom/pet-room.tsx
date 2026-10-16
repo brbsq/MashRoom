@@ -5,20 +5,23 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  PopoverAnchor,
 } from "@/components/ui/popover";
+import { useSceneNavigation } from "./use-scene-navigation";
 import { useApp } from "./provider";
 import { AdoptPet } from "./google-controls";
 import { NeedRing } from "./need-ring";
+import { BgmControls } from "./background-music";
+import { Storeroom } from "./storeroom";
+import { useWallet } from "./use-wallet";
 import { RoomDecorator } from "./room-decorator";
+import { RoomieRenderer, roomieArtworkSources } from "./roomie-renderer";
+import { movementFacing, type RoomieFacing } from "@/lib/roomie-motion";
+import { useRoomie } from "./use-roomie";
+import type { FurnitureInteraction } from "@/lib/room-decor";
 import { RoomIcon, RoomPhone } from "./room-phone";
 import {
   boundRoomPosition,
@@ -47,19 +50,21 @@ const previews: Record<string, string> = {
     "You’re all caught up. Classroom activity notifications will appear here when that feature is connected.",
   History:
     "Your points ledger is planned for a later update. No earned transactions have been recorded in this framework.",
-  Store:
-    "The cosmetics store is coming later. No points will be spent from this preview.",
-  Wardrobe:
-    "Your character’s wardrobe will live here. Clothing purchases and outfit changes are coming later.",
+  Storeroom: "Your demo furniture and current outfit, together in one place. Purchases and earned inventory will arrive with the full economy.",
   Help: "Click or tap the floor to move your character, or focus the room and use the arrow keys or WASD. Tap a need ring for its status; care actions are in Activities. The room button opens your room switcher. Open More options → Decorate room to arrange furniture.",
 };
 
 export function PetRoom({
   onObjectInteraction,
+  onFurnitureInteraction,
 }: {
   onObjectInteraction?: (event: RoomInteraction) => void;
+  onFurnitureInteraction?: (event: FurnitureInteraction) => void;
 }) {
   const { state, care, update } = useApp();
+  const {wallet}=useWallet(state?.profile);
+  const {leaving,navigate}=useSceneNavigation();
+  const { appearance, save: saveRoomie } = useRoomie(state?.profile, state?.pet.name);
   const [roomId, setRoomId] = useState<RoomId>("living");
   const [switcher, setSwitcher] = useState(false);
   const [scenePhase, setScenePhase] = useState<"visible" | "out" | "in">(
@@ -67,11 +72,19 @@ export function PetRoom({
   );
   const [position, setPosition] = useState(startingPosition);
   const [walking, setWalking] = useState(false);
+  const [facing, setFacing] = useState<RoomieFacing>("right");
+  const [returning, setReturning] = useState(false);
+  const [viewReady, setViewReady] = useState(false);
+  const animation = useRef<number | null>(null);
+  const currentPosition = useRef(position);
+  currentPosition.current = position;
   const [action, setAction] = useState<CareAction | null>(null);
   const [message, setMessage] = useState("Happy to see you");
   const [panel, setPanel] = useState<string | null>(null);
+  useEffect(()=>{if(state&&new URLSearchParams(window.location.search).get("inventory")==="1")setPanel("Storeroom");},[state?.profile.id]);
   const [draftName, setDraftName] = useState("");
   const [note, setNote] = useState("");
+  const [renameError,setRenameError] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [editing, setEditing] = useState(false);
   const alive = useRef(true);
@@ -81,6 +94,17 @@ export function PetRoom({
   const switchTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const switching = useRef(false);
   const room = rooms.find((r) => r.id === roomId)!;
+  const viewKey = state ? `mashroom:room-view:v1:${state.profile.mode}:${state.profile.id}:${state.profile.classId}` : "";
+  useEffect(() => {
+    if (!viewKey) return;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(viewKey) || "null");
+      if (saved && rooms.some(r => r.id === saved.roomId)) { setRoomId(saved.roomId); setPosition(boundRoomPosition(saved.position, matchMedia("(max-width:600px)").matches ? 29 : 11.224)); if(saved.facing === "front" || saved.facing === "left" || saved.facing === "right") setFacing(saved.facing); }
+      if(sessionStorage.getItem("mashroom:return-room")) { setReturning(true); setLoaded(true); sessionStorage.removeItem("mashroom:return-room"); }
+    } catch {}
+    setViewReady(true);
+  }, [viewKey]);
+  useEffect(() => { if(viewReady && viewKey)try{sessionStorage.setItem(viewKey,JSON.stringify({roomId,position,facing}));}catch{} },[viewReady,viewKey,roomId,position,facing]);
 
   useEffect(() => {
     alive.current = true;
@@ -90,7 +114,7 @@ export function PetRoom({
         boundRoomPosition(current, compact.matches ? 29 : 11.224),
       );
     compact.addEventListener("change", fitCharacter);
-    const images = ["/rooms/3551a.png", "/rooms/cd2bd.png", "/plaza.png"].map(
+    const images = ["/rooms/3551a.png", ...roomieArtworkSources, "/plaza.png"].map(
       (src) => {
         const img = new window.Image();
         img.src = assetHref(src);
@@ -106,6 +130,7 @@ export function PetRoom({
       compact.removeEventListener("change", fitCharacter);
       clearTimeout(fallback);
       if (movingTimer.current) clearTimeout(movingTimer.current);
+      if (animation.current !== null) cancelAnimationFrame(animation.current);
       if (careTimer.current) clearTimeout(careTimer.current);
       switchTimers.current.forEach(clearTimeout);
     };
@@ -125,25 +150,30 @@ export function PetRoom({
   };
   const move = (target: RoomPosition) => {
     if (editing || switcher || switching.current) return;
-    setPosition(
-      boundRoomPosition(
+    const next = boundRoomPosition(
         target,
         matchMedia("(max-width: 600px)").matches ? 29 : 11.224,
-      ),
-    );
+      );
+    const from = currentPosition.current;
+    if (next.x === from.x && next.y === from.y) return;
+    setFacing(previous => movementFacing(from, next, previous));
+    if(animation.current !== null)cancelAnimationFrame(animation.current);
+    if(matchMedia("(prefers-reduced-motion:reduce)").matches){setPosition(next);setWalking(false);return;}
     setWalking(true);
-    if (movingTimer.current) clearTimeout(movingTimer.current);
-    movingTimer.current = setTimeout(() => setWalking(false), 800);
+    const start=performance.now(),duration=Math.min(800,Math.max(200,Math.hypot(next.x-from.x,next.y-from.y)*25));
+    const step=(now:number)=>{const t=Math.min(1,(now-start)/duration),ease=t*t*(3-2*t);setPosition({x:from.x+(next.x-from.x)*ease,y:from.y+(next.y-from.y)*ease});if(t<1)animation.current=requestAnimationFrame(step);else{animation.current=null;setWalking(false);}};
+    animation.current=requestAnimationFrame(step);
   };
   const switchRoom = (next: RoomId) => {
     setSwitcher(false);
     if (next === roomId || switching.current) return;
     const duration = matchMedia("(prefers-reduced-motion: reduce)").matches
       ? 0
-      : 320;
+      : 800;
     switching.current = true;
     setScenePhase("out");
     setWalking(false);
+    if(animation.current!==null)cancelAnimationFrame(animation.current);
     switchTimers.current.forEach(clearTimeout);
     switchTimers.current = [
       setTimeout(() => {
@@ -178,8 +208,8 @@ export function PetRoom({
     move({ x: position.x + direction[0], y: position.y + direction[1] });
   };
   const openPanel = (name: string) => {
-    if (name === "Rename") setDraftName(pet.name);
-    setPanel(name);
+    if (name === "Rename") { setDraftName(pet.name);setRenameError(""); }
+    setPanel(current=>current===name?null:name);
   };
   const mood =
     Math.min(...needs.map((n) => pet[n.key])) < 25
@@ -189,10 +219,12 @@ export function PetRoom({
         : "a little bored";
 
   return (
-    <main
+    <Popover open={panel!==null&&panel!=="Storeroom"} onOpenChange={open=>!open&&setPanel(null)}><main
       className={styles.world}
       data-loaded={loaded}
+      data-returning={returning}
       data-editing={editing}
+      data-leaving={leaving}
       data-room-phase={scenePhase}
       aria-label="Your pet room"
     >
@@ -239,36 +271,30 @@ export function PetRoom({
               profile={state.profile}
               roomId={roomId}
               editing={editing}
+              characterY={position.y}
+              onFurnitureInteraction={onFurnitureInteraction}
               onFinish={() => {
                 setEditing(false);
                 moreButton.current?.focus({ preventScroll: true });
               }}
-            />
-            <div
+              character={(layer) => <div
               className={styles.characterPosition}
-              style={{ left: `${position.x}%`, bottom: `${100 - position.y}%` }}
+              style={{ left: `${position.x}%`, bottom: `${100 - position.y}%`, zIndex: layer }}
               data-walking={walking}
             >
               <div
                 className={styles.characterMotion}
                 data-action={action || "idle"}
               >
-                <Image
-                  unoptimized
-                  src="/rooms/cd2bd.png"
-                  width={941}
-                  height={1671}
-                  alt={`${pet.name}, your room character`}
-                  className={styles.character}
-                  priority
-                />
+                <RoomieRenderer appearance={appearance} facing={walking ? facing : "front"} walking={walking} label={`${pet.name}, your room character`} className={styles.character}/>
                 {action && (
                   <span className={styles.careBubble} role="status">
                     {careMessages[action]}
                   </span>
                 )}
               </div>
-            </div>
+            </div>}
+            />
             {/* Future furniture registers accessible hotspots and care actions
                 in lib/pet-room.ts; integrations receive the same event contract. */}
             {room.objects.map((object) => (
@@ -306,16 +332,14 @@ export function PetRoom({
           <span className={styles.rollingNews}>
             A little care goes a long way
           </span>
-          <nav className={styles.topActions} aria-label="Room navigation">
+          <PopoverAnchor asChild><nav className={styles.topActions} aria-label="Room navigation">
             <Button
-              asChild
               variant="ghost"
               aria-label="Classroom"
               title="Classroom"
+              onClick={()=>openPanel("Classroom")}
             >
-              <Link href="/classroom">
                 <RoomIcon file="49f16.svg" />
-              </Link>
             </Button>
             <Button
               variant="ghost"
@@ -358,7 +382,7 @@ export function PetRoom({
             >
               <RoomIcon file="9ff62.svg" className={styles.moreIcon} />
             </Button>
-          </nav>
+          </nav></PopoverAnchor>
         </header>
         <aside
           className={styles.needsArea}
@@ -403,14 +427,6 @@ export function PetRoom({
                 ))}
             </PopoverContent>
           </Popover>
-          <div className={styles.roomCaption} aria-live="polite">
-            {room.name}
-            <span>
-              {state.profile.mode === "demo"
-                ? "device-local demo"
-                : "connected profile"}
-            </span>
-          </div>
           <div className={styles.needsUnderlay} inert={switcher}>
             <Button
               variant="ghost"
@@ -435,6 +451,7 @@ export function PetRoom({
             key={`${state.profile.mode}:${state.profile.id}:${state.profile.classId}`}
             profile={state.profile}
             onApp={openPanel}
+            onNavigate={navigate}
           />
         </div>
         <Button
@@ -445,15 +462,12 @@ export function PetRoom({
           Move with a tap or arrow keys <span>?</span>
         </Button>
       </div>
-      <Dialog
-        open={panel !== null}
-        onOpenChange={(open) => !open && setPanel(null)}
-      >
-        <DialogContent className={styles.utilityDialog}>
-          <DialogTitle>
+        <PopoverContent side="bottom" align="end" sideOffset={14} collisionPadding={16} className={styles.utilityDialog} aria-labelledby="room-control-title" onCloseAutoFocus={event=>{event.preventDefault();moreButton.current?.focus({preventScroll:true});}}>
+          <button type="button" className={styles.closePanel} aria-label="Close room panel" onClick={()=>setPanel(null)}>×</button>
+          <h2 id="room-control-title">
             {panel === "Rename" ? "A name of their own" : panel}
-          </DialogTitle>
-          <DialogDescription>
+          </h2>
+          <p className={styles.panelDescription}>
             {panel === "Rename"
               ? "Give your roomie a name."
               : panel === "Notes"
@@ -461,12 +475,14 @@ export function PetRoom({
                 : panel === "Food" || panel === "Activities"
                   ? "A little care makes a big difference."
                   : previews[panel || ""] || "Your MashRoom shortcuts."}
-          </DialogDescription>
+          </p>
+          {panel==="Classroom"&&<><p>Open your class to see its activities and learning space.</p><Button asChild variant="outline"><Link href="/classroom">Open classroom</Link></Button></>}
           {panel === "Rename" && (
             <form
               onSubmit={(event) => {
                 event.preventDefault();
                 if (!draftName.trim()) return;
+                try { saveRoomie({...appearance,name:draftName.trim().slice(0,24)}); } catch { setRenameError("Could not save the name. Your draft is still here; free browser space and try again.");return; }
                 update((s) => ({
                   ...s,
                   pet: { ...s.pet, name: draftName.trim().slice(0, 24) },
@@ -484,6 +500,7 @@ export function PetRoom({
               <Button className="primary-button full" type="submit">
                 Save name
               </Button>
+              {renameError&&<p role="alert">{renameError}</p>}
             </form>
           )}
           {panel === "Notes" && (
@@ -515,14 +532,10 @@ export function PetRoom({
             </div>
           )}
           {(panel === "Bank" || panel === "Wallet") && (
-            <p>
-              {state.profile.mode === "demo"
-                ? "250 sample points · A kind beginning (sample badge). These are demo displays, not earned rewards."
-                : "0 earned points. Your real points and achievements will appear here when the economy is available."}
-            </p>
+            <><p>{wallet?.points??"—"} demo points · {wallet?.tokens??0} arcade tokens</p><p>Device-local wallet, separate from classroom-earned rewards. {wallet?.receipts.length??0} Shop purchases. Arcade game redemption is not connected yet.</p><Button asChild variant="outline"><Link href="/shop">Open Shop & receipts</Link></Button></>
           )}
           {panel === "More options" && (
-            <div className={styles.careActions}>
+            <><BgmControls /><div className={styles.careActions}>
               <Button
                 variant="outline"
                 onClick={() => {
@@ -543,10 +556,10 @@ export function PetRoom({
                   <Link href={href}>{label}</Link>
                 </Button>
               ))}
-            </div>
+            </div></>
           )}
-        </DialogContent>
-      </Dialog>
-    </main>
+        </PopoverContent>
+      <Storeroom open={panel === "Storeroom"} onOpenChange={open => { if (!open) setPanel(null); }} appearance={appearance} onDecorate={() => { setPanel(null); setSwitcher(false); setEditing(true); }} />
+    </main></Popover>
   );
 }

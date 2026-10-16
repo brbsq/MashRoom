@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger,
+  PopoverAnchor,
 } from "@/components/ui/popover";
 import { needTone, needValue, type Need } from "@/lib/pet-room";
 import styles from "./pet-room.module.css";
@@ -12,13 +12,14 @@ import { assetHref } from "@/lib/asset";
 
 export function NeedRing({ need, value }: { need: Need; value: number }) {
   const [open, setOpen] = useState(false);
+  const [clickedAt,setClickedAt]=useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const fromHover = useRef(false);
   const pinned = useRef(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const popupId = useId();
   const changeOpen = (next: boolean) => {
     if (!next) {
       pinned.current = false;
-      fromHover.current = false;
     }
     setOpen(next);
   };
@@ -28,7 +29,7 @@ export function NeedRing({ need, value }: { need: Need; value: number }) {
   const closeSoon = () => {
     if (pinned.current) return;
     cancelClose();
-    timer.current = setTimeout(() => changeOpen(false), 180);
+    timer.current = setTimeout(() => { if (!pinned.current) changeOpen(false); }, 180);
   };
   useEffect(
     () => () => {
@@ -36,30 +37,38 @@ export function NeedRing({ need, value }: { need: Need; value: number }) {
     },
     [],
   );
+  useEffect(() => {
+    if(!open)return;
+    const dismiss=setTimeout(()=>changeOpen(false),3000);
+    return()=>clearTimeout(dismiss);
+  },[open,clickedAt]);
   const percent = needValue(value);
   const tone = needTone(percent);
   return (
     <Popover open={open} onOpenChange={changeOpen}>
-      <PopoverTrigger asChild>
+      <PopoverAnchor asChild>
         <Button
           variant="ghost"
           className={styles.needRing}
           data-tone={tone}
+          ref={trigger}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-controls={open ? popupId : undefined}
           aria-label={`${need.label}: ${percent}%`}
           onPointerEnter={(event) => {
             if (event.pointerType === "mouse") {
               cancelClose();
-              fromHover.current = true;
               setOpen(true);
             }
           }}
           onClick={(event) => {
-            // A click pins an already-hovered popup instead of closing it.
+            // A click keeps a hovered popup briefly; it always dismisses.
             event.preventDefault();
             cancelClose();
-            const next = fromHover.current || !open;
+            setClickedAt(value=>value+1);
+            const next = !pinned.current;
             pinned.current = next;
-            fromHover.current = false;
             changeOpen(next);
           }}
           onPointerLeave={(event) => {
@@ -107,28 +116,27 @@ export function NeedRing({ need, value }: { need: Need; value: number }) {
             style={{
               maskImage: `url(${assetHref(`/rooms/${need.icon}`)})`,
               WebkitMaskImage: `url(${assetHref(`/rooms/${need.icon}`)})`,
+              ...(need.key === "bladder" ? { maskSize: "93.75%", WebkitMaskSize: "93.75%" } : {}),
             }}
           />
         </Button>
-      </PopoverTrigger>
+      </PopoverAnchor>
       <PopoverContent
         side="top"
         sideOffset={12}
         collisionPadding={16}
         className={styles.needPopup}
+        id={popupId}
         aria-label={`${need.label} status`}
         onOpenAutoFocus={(event) => event.preventDefault()}
         onCloseAutoFocus={(event) => event.preventDefault()}
+        onInteractOutside={(event) => { if (trigger.current?.contains(event.target as Node)) event.preventDefault(); }}
         onPointerEnter={cancelClose}
         onPointerLeave={closeSoon}
       >
         <strong>
           {need.label} <span>{percent}%</span>
         </strong>
-        <p>
-          {percent >= 50 ? need.good : need.low}
-          {tone === "red" ? " — needs attention." : "."}
-        </p>
       </PopoverContent>
     </Popover>
   );

@@ -1,9 +1,40 @@
 import type { DecorKind } from "@/lib/room-decor";
 
 // Original code-native illustrations; no external images or upload permissions.
-export function DecorArt({ kind }: { kind: DecorKind }) {
+export function DecorArt({ kind, fitted = false }: { kind: DecorKind; fitted?: boolean }) {
+  const bounds = { sofa: "5 50 190 128", table: "15 62 170 118", shelf: "35 20 130 164", plant: "45 8 110 181", rug: "4 92 192 90", art: "30 18 140 165", lamp:"35 15 130 170",arcade:"35 15 130 170",cushion:"25 55 150 115" };
   return (
-    <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+    <svg viewBox={fitted ? bounds[kind] : "0 0 200 200"} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      {kind === "lamp" && <>
+        <ellipse cx="100" cy="176" rx="54" ry="8" fill="#765c4026"/>
+        <path d="M100 93v67" stroke="#b39477" strokeWidth="9"/>
+        <ellipse cx="100" cy="166" rx="38" ry="12" fill="#c9b99b"/><ellipse cx="100" cy="161" rx="38" ry="10" fill="#e9d5b5"/>
+        <path d="m100 19 18 34 38 6-27 28 6 39-35-17-35 17 6-39-27-28 38-6z" fill="#e6ba70" stroke="#d2a66a" strokeWidth="3" strokeLinejoin="round"/>
+        <path d="m100 25 16 34 35 4-27 25 6 31-30-15-30 15 6-31-27-25 35-4z" fill="#ffe8ad"/>
+        <path d="m78 64 14-4 8-17" fill="none" stroke="#fff8df" strokeWidth="5" strokeLinecap="round"/>
+        <circle cx="90" cy="79" r="3" fill="#8b7456"/><circle cx="110" cy="79" r="3" fill="#8b7456"/><path d="M94 90q6 6 12 0" fill="none" stroke="#b18a62" strokeWidth="2" strokeLinecap="round"/>
+      </>}
+      {kind === "arcade" && <>
+        <ellipse cx="100" cy="180" rx="60" ry="7" fill="#765c4026"/>
+        <path d="M48 22h101l11 149-10 10H44z" fill="#988ab5"/>
+        <path d="M48 22h87l12 149H44z" fill="#c6bfdf"/>
+        <rect x="54" y="29" width="76" height="20" rx="7" fill="#ffe4bd"/>
+        <path d="m86 39 4-5 4 5-4 5zm15 0 4-5 4 5-4 5z" fill="#ba8b99"/>
+        <path d="M55 58h75l5 58H51z" fill="#696581"/>
+        <path d="M61 64h62l4 44H57z" fill="#b0d8c9"/>
+        <path d="M69 98q12-28 25-8 14-23 25 8" fill="#eaf3d6"/><circle cx="102" cy="78" r="7" fill="#ffedb1"/>
+        <path d="M51 120h85l9 17H47z" fill="#e4d9ec"/>
+        <path d="M74 128v-8" stroke="#70667d" strokeWidth="4"/><circle cx="74" cy="119" r="5" fill="#db93ac"/>
+        <ellipse cx="110" cy="126" rx="5" ry="3" fill="#e5ac88"/><ellipse cx="123" cy="126" rx="5" ry="3" fill="#8dbba8"/>
+        <path d="M64 145h64v20H64z" fill="#b0a3c7"/><rect x="88" y="150" width="15" height="3" rx="1.5" fill="#776e8c"/>
+      </>}
+      {kind === "cushion" && <>
+        <ellipse cx="100" cy="162" rx="70" ry="7" fill="#765c4026"/>
+        <path d="M100 159C-18 105 38 23 100 75c62-52 118 30 0 84z" fill="#d592a6"/>
+        <path d="M100 151C-10 101 41 30 100 82c59-52 110 19 0 69z" fill="#f0b5c3"/>
+        <path d="M51 80q-13 14-7 28" fill="none" stroke="#ffdae1" strokeWidth="7" strokeLinecap="round"/>
+        <path d="M53 124q20 17 47 31 28-14 47-31" fill="none" stroke="#ce8fa3" strokeWidth="2" strokeDasharray="3 4"/>
+      </>}
       {kind === "sofa" && (
         <>
           <ellipse

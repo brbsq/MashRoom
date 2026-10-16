@@ -103,7 +103,9 @@
   color: #555;
   font-size: clamp(14px, 1.5625vw, 30px);
   font-weight: 800;
-  background: rgb(232 232 232 / 29%);
+  background: linear-gradient(115deg,#b9efda80,#f6bacb80,#b9efda80);
+  background-size: 220% 100%;
+  animation: signupFlow 8s ease-in-out infinite;
   pointer-events: auto;
 }
 .brand {
@@ -116,10 +118,10 @@
 }
 .logo {
   position: absolute;
-  width: 43.0208%;
+  width: min(43.0208vw,65vh);
   height: auto;
-  left: 28.4896%;
-  top: 11.4815%;
+  left: calc(50% - min(21.5104vw,32.5vh));
+  top: calc(50% - min(14.3403vw,21.6667vh) - 6.25vw - 4px);
   opacity: 0;
   transform: translateY(16px) scale(0.97);
   transition:
@@ -134,7 +136,7 @@
 .brandName {
   position: absolute;
   left: 50%;
-  top: 72.6389%;
+  top: calc(50% + min(14.3403vw,21.6667vh) + 4px);
   transform: translate(-50%, -40%);
   font-family: "MashRoom Display", sans-serif;
   font-weight: 700;
@@ -142,7 +144,7 @@
   line-height: 1.2;
   white-space: nowrap;
   color: rgb(255 255 255 / 50%);
-  -webkit-text-stroke: 1px rgb(255 255 255 / 55%);
+  -webkit-text-stroke: 0;
   opacity: 0;
   transition:
     left 1.35s var(--settle),
@@ -157,6 +159,8 @@
 .brandName strong {
   font-weight: 900;
 }
+@keyframes signupFlow { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.login:hover { box-shadow: inset 0 1px #fff,0 0 24px #b9efdaaa,0 0 42px #f3a9c080!important; }
 .welcome[data-phase="intro"] .logo {
   opacity: 0.8;
   transform: none;
@@ -235,7 +239,9 @@
     100% 50%;
   background-clip: text;
   -webkit-background-clip: text;
-  -webkit-text-stroke: 1px rgb(255 255 255 / 65%);
+  /* Stroke traces overlapping font contours inside the R. Clip one fill
+     and glow its final silhouette so every letter stays seamless. */
+  -webkit-text-stroke: 0;
   filter: drop-shadow(0 0 8px #fff9) drop-shadow(0 0 22px #ffe8a877);
   animation: starlight 3.6s ease-in-out infinite;
   transition:
@@ -320,6 +326,9 @@
   translate: 0 0;
   filter: blur(0);
 }
+.welcome:is([data-phase="entering"], [data-phase="ready"]) .tagline {
+  opacity: .5;
+}
 .navGlass {
   transition-delay: 0.25s;
 }
@@ -341,8 +350,7 @@
 .navLink,
 .login,
 .role,
-.sound,
-.skip {
+.sound {
   transition-property:
     opacity, translate, filter, transform, box-shadow, background;
   transition-duration: 0.6s;
@@ -351,8 +359,7 @@
 .navLink:hover,
 .login:hover,
 .role:hover,
-.sound:hover,
-.skip:hover {
+.sound:hover {
   transform: scale(1.065);
   box-shadow:
     0 0 26px rgb(255 249 209 / 50%),
@@ -386,21 +393,6 @@
   outline-offset: 5px;
   border-radius: 8px;
   filter: drop-shadow(0 0 10px #fff8);
-}
-.skip {
-  position: absolute;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff3;
-  border: 1px solid #fff5;
-  color: #342d22;
-  border-radius: 30px;
-  z-index: 4;
-  font-size: 13px;
-}
-.skip:hover {
-  transform: translateX(-50%) scale(1.06);
 }
 .infoDialog {
   background: rgb(255 251 240 / 94%);
@@ -499,12 +491,12 @@
     background: #fff3;
   }
   .logo {
-    left: 10%;
-    top: 24%;
-    width: 80%;
+    left: calc(50% - min(40vw,32.5vh));
+    top: calc(50% - min(26.6667vw,21.6667vh) - 9.6vw - 4px);
+    width: min(80vw,65vh);
   }
   .brandName {
-    top: 61%;
+    top: calc(50% + min(26.6667vw,21.6667vh) + 4px);
     font-size: 16vw;
   }
   .welcome:is([data-phase="entering"], [data-phase="ready"]) .logo {
@@ -589,9 +581,6 @@
   .word:hover,
   .word:focus-visible {
     transform: none;
-  }
-  .skip {
-    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) and (max-width: 600px) {

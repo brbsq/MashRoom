@@ -1,0 +1,18 @@
+.original { width: 100%; height: 100%; object-fit: contain; object-position: center bottom; display: block; pointer-events: none; }
+.walkAtlas { animation: roomieWalk .64s step-end infinite; }
+.blinkClip { transform: scaleY(0); transform-box: fill-box; transform-origin: 50% 0%; }
+.blinkClip[data-active=true] { animation: roomieBlink 210ms both; }
+@keyframes roomieBlink {
+  0% { transform: scaleY(0); animation-timing-function: cubic-bezier(.3,0,.7,1); }
+  34%,47% { transform: scaleY(1); animation-timing-function: cubic-bezier(.2,0,.35,1); }
+  100% { transform: scaleY(0); }
+}
+/* Each cell is a complete, registered pose. Step changes avoid blending limbs. */
+@keyframes roomieWalk {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-456px, 0); }
+  50% { transform: translate(0, -750px); }
+  75% { transform: translate(-456px, -750px); }
+}
+@media(prefers-reduced-motion:reduce) { .original, .walkAtlas { animation: none!important; } }
+@media(prefers-reduced-motion:reduce) { .blinkClip[data-active] { animation: none!important; transform: scaleY(0); } }

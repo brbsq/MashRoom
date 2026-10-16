@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Leaf, ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useApp } from "@/components/mashroom/provider";
 import { classes } from "@/lib/demo";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { releaseLabel, buildDescription } from "@/lib/build-version";
+import styles from "./login.module.css";
 export default function Login() {
   const router = useRouter();
   const { state, start, google } = useApp();
@@ -33,43 +35,34 @@ export default function Login() {
       );
   }, []);
   return (
-    <main className="login-page">
-      <Link href="/" className="brand">
-        <span className="brand-mark">
-          <Leaf />
-        </span>
-        MashRoom.
-      </Link>
-      <div className="login-layout">
-        <div className="login-art">
-          <span className="small-pill">
-            <Sparkles size={15} /> YOUR NEW CHAPTER
-          </span>
-          <h1>
-            A little hello.
-            <br />
-            <em>A lot to discover.</em>
-          </h1>
+    <main className={`login-page ${styles.page}`}>
+      <div className={styles.background} aria-hidden="true"><Image src="/landing/room.png" width={1254} height={1254} alt="" priority unoptimized/></div>
+      <header className={styles.header}>
+        <Link href="/" className={styles.brand} aria-label="MashRoom home"><Image src="/landing/logo.png" width={1536} height={1024} alt="" unoptimized/><span>MashRoom</span></Link>
+        <span className={styles.version} title={buildDescription}>{releaseLabel}</span>
+      </header>
+      <div className={`login-layout ${styles.layout}`}>
+        <div className={`login-art ${styles.art}`}>
+          <h1>Hello, Roomie.</h1>
           <Image
             unoptimized
-            width={1254}
-            height={1254}
-            src="/pet.png"
-            alt="Mochi waving hello"
-            className="float"
+            width={1536}
+            height={1024}
+            src="/landing/logo.png"
+            alt="MashRoom logo"
+            priority
+            className={styles.heroLogo}
           />
-          <p>Your little buddy is ready when you are.</p>
         </div>
-        <section className="glass login-card">
-          <span className="eyebrow">COME ON IN</span>
-          <h2>Welcome to MashRoom</h2>
+        <section className={`glass login-card ${styles.card}`} aria-labelledby="login-heading">
+          <h2 id="login-heading">Welcome to MashRoom</h2>
           <p>Pick a name. Find your class. Make yourself at home.</p>
           <form
             onSubmit={(e) => {
               e.preventDefault();
               if (name.trim().length < 2) return;
               start(name.trim(), classId);
-              router.push("/pet");
+              router.push(state?.profile.name === name.trim() && state.profile.classId === classId ? "/pet" : "/roomie-maker?initial=1");
             }}
           >
             <label htmlFor="display-name">What should we call you?</label>

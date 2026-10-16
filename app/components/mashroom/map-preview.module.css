@@ -1,0 +1,101 @@
+.preview { --ink: #352f28; --sage: #526d45; position: fixed; inset: 0; overflow: hidden; color: var(--ink); background-size: cover; background-position: center; font-family: Arial, Helvetica, sans-serif; }
+.preview button, .preview a { -webkit-tap-highlight-color: transparent; }
+.preview button { cursor: pointer; font: inherit; }
+.preview button:focus-visible, .preview a:focus-visible, .viewport:focus-visible { outline: 3px solid #eb8649; outline-offset: 4px; }
+.preview button:disabled { cursor: default; opacity: .35; }
+.roomScene { position: absolute; inset: 0; background: #3d2d221f; }
+.roomScene img { position: absolute; height: 62%; bottom: 4%; left: 4%; filter: blur(2px); }
+.comparison { position: absolute; z-index: 30; top: 14px; left: 20px; right: 20px; min-height: 64px; display: flex; gap: 22px; align-items: center; padding: 9px 14px 9px 22px; border: 1px solid #ffffffa6; border-radius: 22px; background: #fff9eedb; backdrop-filter: blur(24px); box-shadow: 0 8px 30px #4e311213; }
+.previewLabel { font-size: 10px; letter-spacing: .16em; font-weight: 700; white-space: nowrap; }
+.previewLabel > span { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #7c9465; margin-right: 7px; }
+.previewLabel small { display: block; font-size: 11px; font-weight: 400; letter-spacing: 0; margin-top: 5px; color: #81766a; }
+.variants, .modes { display: flex; align-items: center; gap: 5px; }
+.variants { flex: 1; }
+.variants button { display: flex; align-items: center; gap: 8px; border: 1px solid transparent; border-radius: 13px; padding: 9px 12px; font-size: 12px; background: transparent; color: #766857; transition: background .2s, box-shadow .2s; white-space: nowrap; }
+.variants b { display: grid; place-items: center; width: 23px; height: 23px; border-radius: 7px; background: #d9cfbf69; font-size: 10px; }
+.variants button[aria-pressed=true] { color: #302b24; background: #fffaf1; border-color: #ded1ba; box-shadow: 0 2px 5px #5d3c1410; }
+.variants button[aria-pressed=true] b { background: #e6ad78; color: #573617; }
+.modes { border-left: 1px solid #d4c8b7; padding-left: 14px; }
+.modes button { display: flex; align-items: center; gap: 7px; font-size: 11px; border: 0; padding: 11px 12px; border-radius: 11px; background: transparent; color: #716452; white-space: nowrap; }
+.modes button[aria-pressed=true] { background: #e1e6d2; color: #3f5534; }
+.backdrop { position: absolute; inset: 94px 0 0; display: grid; place-items: center; transition: background .35s; }
+.overlayBackdrop { background: #382d245c; backdrop-filter: blur(12px); padding: 24px 4%; }
+.mapPanel { display: flex; flex-direction: column; overflow: hidden; background: #eee3cd; box-shadow: 0 18px 70px #2d221d26; animation: arrive .45s ease both; outline: none; }
+.full { width: 100%; height: 100%; }
+.overlay { width: min(1400px, 100%); height: min(820px, 100%); border-radius: 30px; border: 1px solid #fff8ea; padding: 8px; background: #fff5e8b8; backdrop-filter: blur(28px); }
+.mapHeader { position: relative; z-index: 5; display: flex; align-items: center; gap: 24px; min-height: 78px; padding: 14px 28px; background: #fff7e7d1; border-bottom: 1px solid #fff8ec; }
+.brand { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 750; letter-spacing: -.8px; color: var(--ink); text-decoration: none; }
+.brand img { width: 45px; height: 38px; object-fit: contain; }
+.title { border-left: 1px solid #d8ccb7; padding-left: 24px; font-size: 16px; font-weight: 600; }
+.title small { display: block; color: #837761; font-size: 11px; margin-top: 4px; font-weight: 400; }
+.iconButton { display: grid; place-items: center; min-width: 44px; height: 44px; border: 1px solid #fff; border-radius: 50%; background: #fffbf19c; margin-left: auto; transition: transform .2s, box-shadow .2s; }
+.iconButton:hover { transform: scale(1.06); box-shadow: 0 0 18px #fff9d9; }
+.mapBody { min-height: 0; flex: 1; display: flex; }
+.mapRegion { min-width: 0; flex: 1; position: relative; overflow: hidden; background: #e3d8bf; }
+.viewport { position: absolute; inset: 0; touch-action: none; cursor: grab; overflow: hidden; }
+.viewport:active { cursor: grabbing; }
+.board { position: absolute; left: 50%; top: 50%; transform-origin: center; user-select: none; animation: reveal .4s ease; }
+.mapArt { width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+.filterRow { position: absolute; top: 18px; left: 18px; z-index: 6; display: flex; gap: 4px; padding: 5px; border-radius: 18px; border: 1px solid #fff9ea; background: #fff8e6d9; backdrop-filter: blur(20px); box-shadow: 0 3px 18px #654d1e14; }
+.filterRow button { height: 36px; min-width: 42px; border: none; border-radius: 12px; font-size: 12px; padding: 0 14px; color: #625947; background: transparent; }
+.filterRow button[aria-pressed=true] { background: #dce4cd; color: #39532c; }
+.filterRow button:last-child { display: grid; place-items: center; padding: 0 10px; border-left: 1px solid #dbd0ba; border-radius: 0 12px 12px 0; }
+.pin { position: absolute; z-index: 2; display: flex; align-items: center; gap: 7px; transform: translate(-50%, -90%); padding: 0; border: 0; background: transparent; filter: drop-shadow(0 3px 5px #392b2030); transition: filter .2s; }
+.pinIcon { position: relative; width: 44px; height: 44px; display: grid; place-items: center; background: #fff9e9ed; color: #594731; border: 2px solid #fff; border-radius: 50% 50% 50% 8px; transform: rotate(-45deg); transition: background .2s, box-shadow .2s; }
+.pinIcon svg { transform: rotate(45deg); }
+.pinLabel { padding: 9px 13px; border-radius: 15px; background: #fff9e9ee; color: #41372c; text-align: left; font-size: 12px; font-weight: 600; white-space: nowrap; border: 1px solid #fff5df; }
+.pinLabel small { display: block; font-size: 9px; font-weight: 400; color: #6f785c; margin-top: 2px; }
+.selected { z-index: 4; }
+.selected .pinIcon { background: #e98143; color: white; box-shadow: 0 0 0 5px #fff7dc88, 0 0 22px #fff2ad; }
+.selected .pinLabel { background: #fffbed; }
+.pin:hover { filter: drop-shadow(0 0 8px #fff2c9); }
+.future .pinIcon { color: #807360; background: #eee4d4ed; }
+.future .pinLabel { background: #efe6d6ec; color: #837561; }
+.zoom { position: absolute; z-index: 5; left: 18px; bottom: 20px; display: flex; flex-direction: column; align-items: center; border: 1px solid #fff9ea; border-radius: 20px; padding: 5px; background: #fff9e6e3; backdrop-filter: blur(18px); }
+.zoom button { display: grid; place-items: center; width: 40px; height: 40px; border: none; border-radius: 13px; background: transparent; color: #574b36; }
+.zoom button:hover:not(:disabled) { background: #e3e6d3; }
+.zoom span { font-size: 9px; color: #81725f; }
+.mapHint { position: absolute; z-index: 4; right: 18px; bottom: 18px; font-size: 10px; color: #594d37; padding: 7px 12px; background: #fff9e3d9; border-radius: 12px; pointer-events: none; }
+.destination { flex-shrink: 0; width: clamp(260px, 25vw, 350px); display: flex; flex-direction: column; padding: 22px; background: #fff7e7f2; border-left: 1px solid #fffaf0; overflow-y: auto; }
+.destinationPicture { position: relative; flex-shrink: 0; height: clamp(120px, 20vh, 200px); border-radius: 20px; border: 1px solid #fff; background-size: 300%; }
+.destinationPicture > span { position: absolute; bottom: -20px; left: 16px; display: grid; place-items: center; width: 50px; height: 50px; background: #f1bd8b; border: 3px solid #fff8e8; border-radius: 18px; }
+.destinationInfo { padding-top: 42px; animation: reveal .3s ease; }
+.eyebrow { font-size: 9px; font-weight: 600; letter-spacing: .16em; color: #887d65; }
+.destination h1 { font-size: clamp(22px, 2.2vw, 30px); letter-spacing: -1px; margin: 9px 0 12px; line-height: 1.15; }
+.destination p { font-size: 14px; line-height: 1.65; color: #80735f; min-height: 65px; margin: 0 0 28px; }
+.visit, .coming { min-height: 48px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 20px; border-radius: 16px; text-decoration: none; font-size: 14px; font-weight: 600; }
+.visit { background: var(--sage); color: white; box-shadow: inset 0 1px #ffffff40; transition: background .2s, transform .2s; }
+.visit:hover { background: #617f51; transform: translateY(-2px); }
+.coming { justify-content: center; color: #8c7b63; background: #e8decc; }
+.demoNote { display: block; color: #9a8d76; font-size: 9px; text-align: center; margin-top: 20px; }
+.placeList { position: absolute; z-index: 10; top: 75px; left: 18px; min-width: 230px; background: #fff9ecef; border: 1px solid white; backdrop-filter: blur(24px); border-radius: 20px; padding: 8px; box-shadow: 0 12px 24px #3d2e1826; }
+.placeList button { display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%; min-height: 44px; padding: 10px 12px; border: 0; border-radius: 12px; background: transparent; text-align: left; font-size: 13px; }
+.placeList button:hover { background: #e5e9d6; }
+.placeList small { font-size: 10px; color: #8c7e67; }
+.district { position: absolute; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; width: 29%; height: 30%; border: 1px dashed #fff7e5d9; background: #f1e7d4ba; backdrop-filter: saturate(.2) blur(2px); border-radius: 45%; color: #776c58; pointer-events: none; }
+.district strong { font-size: 13px; }.district small { font-size: 10px; }
+.garden { left: 19%; top: 7%; }.riverside { right: 1%; top: 7%; }
+.quarter { position: absolute; left: 38%; bottom: 12%; padding: 9px 18px; border-radius: 20px; background: #fff6dfc9; font-size: 12px; color: #6a593e; }
+.worldSwitch { display: flex; gap: 4px; position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 6; background: #fff9e7e8; backdrop-filter: blur(18px); padding: 5px; border: 1px solid #fffdf5; border-radius: 18px; }
+.worldSwitch button { border: 0; border-radius: 13px; background: transparent; padding: 10px 16px; font-size: 12px; color: #63573f; white-space: nowrap; }
+.worldSwitch button[aria-pressed=true] { background: #dce4cc; color: #3e5534; }
+.worldSwitch ~ .mapHint { display: none; }
+.closed { position: absolute; inset: 94px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f5e6cc91; backdrop-filter: blur(14px); text-align: center; padding: 20px; }
+.closed > span { font-size: 10px; letter-spacing: .2em; color: #7b6a50; }.closed h1 { font-size: clamp(28px, 5vw, 58px); letter-spacing: -2px; margin: 20px 0 10px; }.closed p { font-size: 14px; color: #7b6b52; margin: 0 0 30px; }
+.closed > button { display: flex; align-items: center; gap: 18px; border: 1px solid #fff7e7; border-radius: 20px; padding: 16px 24px; color: #fff; background: #596e44; }.closed a { margin-top: 24px; font-size: 12px; color: #5c503d; }
+@keyframes arrive { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: none; } }
+@keyframes reveal { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 1100px) { .comparison { gap: 10px; padding-left: 12px; }.previewLabel { display: none; }.variants button { padding: 8px; font-size: 11px; }.modes { padding-left: 8px; }.mapHeader { padding: 12px 20px; }.title small { max-width: 260px; }.destination { width: 260px; padding: 18px; } }
+@media (max-width: 720px) {
+  .comparison { top: 8px; left: 8px; right: 8px; min-height: 114px; flex-wrap: wrap; gap: 5px; padding: 6px; border-radius: 18px; }
+  .variants { width: 100%; justify-content: space-between; gap: 2px; }.variants button { min-height: 44px; flex: 1; justify-content: center; padding: 7px 4px; gap: 4px; font-size: 10px; }.variants b { width: 19px; height: 20px; font-size: 9px; }.modes { width: 100%; justify-content: center; border: none; padding: 0; }.modes button { min-height: 44px; padding: 8px 18px; }
+  .backdrop, .closed { top: 132px; }.overlayBackdrop { padding: 10px; }.overlay { border-radius: 22px; padding: 4px; }
+  .mapHeader { min-height: 64px; padding: 10px 14px; gap: 12px; }.brand { font-size: 20px; }.brand img { width: 32px; height: 30px; }.title { font-size: 12px; padding-left: 12px; }.title small { display: none; }.iconButton { width: 40px; min-width: 40px; height: 40px; }
+  .mapBody { flex-direction: column; }.mapRegion { flex: 1; min-height: 180px; }
+  .destination { width: 100%; flex-direction: row; align-items: center; gap: 14px; padding: 14px 16px; max-height: 235px; border-left: 0; border-top: 1px solid #fffbef; overflow-y: auto; }
+  .destinationPicture { width: 72px; height: 90px; border-radius: 14px; }.destinationPicture > span { width: 34px; height: 34px; border-width: 2px; bottom: -10px; left: 8px; border-radius: 12px; }.destinationPicture svg { width: 19px; }
+  .destinationInfo { flex: 1; padding: 0; }.destination h1 { font-size: 21px; margin: 5px 0; }.destination p { font-size: 11px; min-height: 0; margin: 0 0 10px; line-height: 1.5; }.eyebrow { font-size: 8px; }.visit, .coming { min-height: 40px; padding: 9px 14px; font-size: 12px; border-radius: 13px; }.demoNote { display: none; }
+  .filterRow { top: 10px; left: 10px; padding: 4px; border-radius: 14px; }.filterRow button { height: 44px; padding: 0 10px; font-size: 11px; }
+  .pinLabel { font-size: 11px; padding: 7px 10px; }.pinIcon { width: 44px; height: 44px; }.pinIcon svg { width: 18px; }.zoom { left: 10px; bottom: 10px; border-radius: 14px; padding: 2px; }.zoom button { width: 44px; height: 44px; }.mapHint { display: none; }.worldSwitch { bottom: 10px; }.worldSwitch button { min-height: 44px; padding: 8px 10px; font-size: 10px; }.placeList { top: 72px; left: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .preview *, .preview *::before, .preview *::after { animation: none !important; transition: none !important; } }

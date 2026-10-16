@@ -14,6 +14,9 @@ import type { CareAction, DemoState, GoogleConnection } from "@/lib/types";
 import { toast, Toaster } from "sonner";
 import { chime } from "@/lib/sound";
 import { decorStorageKey } from "@/lib/room-decor";
+import { appearanceStorageKey } from "@/lib/roomie";
+import { mapStorageKey } from "@/lib/rooma-map";
+import { walletStorageKey } from "@/lib/wallet";
 const staticDemo = process.env.NEXT_PUBLIC_MASHROOM_PAGES === "1";
 type ContextValue = {
   state: DemoState | null;
@@ -178,6 +181,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const s = seed(ref.current.profile);
           try {
             localStorage.removeItem(decorStorageKey(s.profile));
+            localStorage.removeItem(appearanceStorageKey(s.profile));
+            localStorage.removeItem(mapStorageKey(s.profile));
+            localStorage.removeItem(walletStorageKey(s.profile));
+            window.dispatchEvent(new Event("mashroom:wallet"));
+            window.dispatchEvent(new Event("mashroom:appearance"));
           } catch {
             toast.error("Could not clear room decorations from this device.");
           }

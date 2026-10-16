@@ -1,4 +1,8 @@
 /work/
+# Local design exports and temporary document renders, not application source.
+/output/mockups/
+/output/pdf/
+/tmp/
 .DS_Store
 app/node_modules/
 app/dist/

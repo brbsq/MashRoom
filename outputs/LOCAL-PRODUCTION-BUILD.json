@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-15",
+  "scope": "Local production only",
+  "screens": [
+    "/pet",
+    "/plaza"
+  ],
+  "checks": {
+    "typecheck": "passed",
+    "regressions": "42 passed",
+    "frameworkBuild": "passed",
+    "pagesBuild": "passed",
+    "artworkCopies": "6 source assets match both production outputs",
+    "whitespace": "passed"
+  },
+  "assets": [
+    {
+      "file": "cd2bd.png",
+      "source": "app/public/rooms/cd2bd.png",
+      "framework": "app/dist/client/rooms/cd2bd.png",
+      "pages": "app/dist/pages/rooms/cd2bd.png",
+      "sha256": "ed8bbe5ef53fec00dda66a39f125d69839c76610c1b23a83793800600ffa0575"
+    },
+    {
+      "file": "roomie-left.png",
+      "source": "app/public/rooms/roomie-left.png",
+      "framework": "app/dist/client/rooms/roomie-left.png",
+      "pages": "app/dist/pages/rooms/roomie-left.png",
+      "sha256": "3fbfcd707a7571808e20615bdb93dc1783fb56d786dc8aeaf7537ca12326312b"
+    },
+    {
+      "file": "roomie-right.png",
+      "source": "app/public/rooms/roomie-right.png",
+      "framework": "app/dist/client/rooms/roomie-right.png",
+      "pages": "app/dist/pages/rooms/roomie-right.png",
+      "sha256": "1d7c0c144cf670d99b23c0fc75c67a938297dc4bb504b6fa24475a1ef755fd39"
+    },
+    {
+      "file": "roomie-walk-left.png",
+      "source": "app/public/rooms/roomie-walk-left.png",
+      "framework": "app/dist/client/rooms/roomie-walk-left.png",
+      "pages": "app/dist/pages/rooms/roomie-walk-left.png",
+      "sha256": "6f72c2e0882491251f6d29dbbe11671ba548d54b02a3ff71b0924b20c72b2740"
+    },
+    {
+      "file": "roomie-walk-right.png",
+      "source": "app/public/rooms/roomie-walk-right.png",
+      "framework": "app/dist/client/rooms/roomie-walk-right.png",
+      "pages": "app/dist/pages/rooms/roomie-walk-right.png",
+      "sha256": "5c243466a0ba4675ec5b45c970b517cdf9fcfa815f6602cc908906078f123b4b"
+    },
+    {
+      "file": "roomie-walk-front.png",
+      "source": "app/public/rooms/roomie-walk-front.png",
+      "framework": "app/dist/client/rooms/roomie-walk-front.png",
+      "pages": "app/dist/pages/rooms/roomie-walk-front.png",
+      "sha256": "6abf2df3d4b57f73e02d29d37ffd40a7243c231a703000e43e4b68b8a6510569"
+    }
+  ]
+}
